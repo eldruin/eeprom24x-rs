@@ -1,0 +1,20 @@
+[package]
+name = "at24cxxx"
+version = "0.1.0"
+authors = ["Diego Barrios Romero <eldruin@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Platform-agnostic Rust driver for the AT24CXXX Serial EEPROM."
+categories = ["embedded", "hardware-support", "no-std"]
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
+
+[features]
+default = []
+
+[dependencies]
+embedded-hal = "0.2"
+
+[profile.release]
+lto = true
