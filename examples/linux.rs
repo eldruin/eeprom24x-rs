@@ -8,7 +8,7 @@ use at24cx::{At24cx, SlaveAddr};
 
 fn main() {
     let dev = I2cdev::new("/dev/i2c-1").unwrap();
-    let mut eeprom = At24cx::new(dev, SlaveAddr::default().addr());
+    let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default().addr());
     let memory_address = [0x12, 0x34];
     let data = 0xAB;
 

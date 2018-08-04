@@ -28,7 +28,7 @@
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let address = SlaveAddr::default().addr();
-//! let mut eeprom = At24cx::new(dev, address);
+//! let mut eeprom = At24cx::new_at24c256(dev, address);
 //! # }
 //! ```
 //!
@@ -45,7 +45,7 @@
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let (a2, a1, a0) = (false, false, true);
 //! let address = SlaveAddr::Alternative(a2, a1, a0).addr();
-//! let mut eeprom = At24cx::new(dev, address);
+//! let mut eeprom = At24cx::new_at24c256(dev, address);
 //! # }
 //! ```
 //!
@@ -60,7 +60,7 @@
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut eeprom = At24cx::new(dev, SlaveAddr::default().addr());
+//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default().addr());
 //! let address = [0x12, 0x34];
 //! let data = 0xAB;
 //! eeprom.write_byte(&address, data);
@@ -80,14 +80,13 @@
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut eeprom = At24cx::new(dev, SlaveAddr::default().addr());
+//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default().addr());
 //! let address = [0x12, 0x34];
 //! let data = [0xAB; 64];
 //! eeprom.write_page(&address, &data);
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
 //! # }
 //! ```
-
 
 #![deny(unsafe_code)]
 #![deny(missing_docs)]
@@ -96,6 +95,9 @@
 extern crate embedded_hal as hal;
 
 use hal::blocking::i2c::{Write, WriteRead};
+use core::marker::PhantomData;
+
+pub mod ic;
 
 /// All possible errors in this crate
 #[derive(Debug)]
@@ -139,25 +141,19 @@ impl SlaveAddr {
 
 /// AT24CX driver
 #[derive(Debug, Default)]
-pub struct At24cx<I2C> {
+pub struct At24cx<I2C, IC> {
     /// The concrete I²C device implementation.
     i2c: I2C,
     /// The I²C device address.
-    address: u8
+    address: u8,
+
+    _ic: PhantomData<IC>,
 }
 
-impl<I2C, E> At24cx<I2C>
+impl<I2C, E, IC> At24cx<I2C, IC>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Create a new instance
-    pub fn new(i2c: I2C, address: u8) -> Self {
-        At24cx {
-            i2c,
-            address
-        }
-    }
-
     /// Destroy driver instance, return I²C bus instance.
     pub fn destroy(self) -> I2C {
         self.i2c
@@ -176,31 +172,6 @@ where
             .map_err(Error::I2c)
     }
 
-    /// Write up to a page (64 bytes) starting in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-        const PAGE_SIZE : usize = 64;
-        if data.len() > PAGE_SIZE {
-            // This would actually be supported by the EEPROM but
-            // the data would be overwritten
-            return Err(Error::TooMuchData);
-        }
-        if data.len() == 0 {
-            return Ok(());
-        }
-        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        payload[0] = address[0];
-        payload[1] = address[1];
-        payload[2..=(1+data.len())].copy_from_slice(&data);
-        self.i2c
-            .write(self.address, &payload[..=(1 + data.len())])
-            .map_err(Error::I2c)
-    }
-
     /// Read a single byte from an address.
     pub fn read_byte(&mut self, address: &[u8; 2]) -> Result<u8, Error<E>> {
         let mut data = [0; 1];
@@ -210,6 +181,194 @@ where
     }
 }
 
+impl<I2C, E> At24cx<I2C, ic::AT24C32>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+{
+    /// Create a new instance
+    pub fn new_at24c32(i2c: I2C, address: u8) -> Self {
+        At24cx {
+            i2c,
+            address,
+            _ic : PhantomData,
+        }
+    }
+
+    /// Write up to a page starting in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+        if data.len() == 0 {
+            return Ok(());
+        }
+        const PAGE_SIZE: usize = 32;
+        if data.len() > PAGE_SIZE {
+            // This would actually be supported by the EEPROM but
+            // the data would be overwritten
+            return Err(Error::TooMuchData);
+        }
+        
+        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
+        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+    }
+}
+
+impl<I2C, E> At24cx<I2C, ic::AT24C64>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+{
+    /// Create a new instance
+    pub fn new_at24c64(i2c: I2C, address: u8) -> Self {
+        At24cx {
+            i2c,
+            address,
+            _ic : PhantomData,
+        }
+    }
+
+    /// Write up to a page starting in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+        if data.len() == 0 {
+            return Ok(());
+        }
+        const PAGE_SIZE: usize = 32;
+        if data.len() > PAGE_SIZE {
+            // This would actually be supported by the EEPROM but
+            // the data would be overwritten
+            return Err(Error::TooMuchData);
+        }
+        
+        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
+        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+    }
+}
+
+
+impl<I2C, E> At24cx<I2C, ic::AT24C128>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+{
+    /// Create a new instance
+    pub fn new_at24c128(i2c: I2C, address: u8) -> Self {
+        At24cx {
+            i2c,
+            address,
+            _ic : PhantomData,
+        }
+    }
+
+    /// Write up to a page starting in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+        if data.len() == 0 {
+            return Ok(());
+        }
+        const PAGE_SIZE: usize = 64;
+        if data.len() > PAGE_SIZE {
+            // This would actually be supported by the EEPROM but
+            // the data would be overwritten
+            return Err(Error::TooMuchData);
+        }
+        
+        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
+        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+    }
+}
+
+
+impl<I2C, E> At24cx<I2C, ic::AT24C256>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+{
+    /// Create a new instance
+    pub fn new_at24c256(i2c: I2C, address: u8) -> Self {
+        At24cx {
+            i2c,
+            address,
+            _ic : PhantomData,
+        }
+    }
+
+    /// Write up to a page starting in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+        if data.len() == 0 {
+            return Ok(());
+        }
+        const PAGE_SIZE: usize = 64;
+        if data.len() > PAGE_SIZE {
+            // This would actually be supported by the EEPROM but
+            // the data would be overwritten
+            return Err(Error::TooMuchData);
+        }
+        
+        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
+        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+    }
+}
+
+impl<I2C, E> At24cx<I2C, ic::AT24C512>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+{
+    /// Create a new instance
+    pub fn new_at24c512(i2c: I2C, address: u8) -> Self {
+        At24cx {
+            i2c,
+            address,
+            _ic : PhantomData,
+        }
+    }
+
+    /// Write up to a page starting in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+        if data.len() == 0 {
+            return Ok(());
+        }
+        const PAGE_SIZE: usize = 128;
+        if data.len() > PAGE_SIZE {
+            // This would actually be supported by the EEPROM but
+            // the data would be overwritten
+            return Err(Error::TooMuchData);
+        }
+        
+        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
+        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+    }
+}
+
+
+fn write_payload<I2C, E>(device_address: u8, address: &[u8; 2],
+                         data: &[u8], payload: &mut [u8], i2c: &mut I2C) -> Result<(), Error<E>>
+    where I2C: Write<Error = E>
+{
+    payload[0] = address[0];
+    payload[1] = address[1];
+    payload[2..=(1+data.len())].copy_from_slice(&data);
+    i2c.write(device_address, &payload[..=(1 + data.len())])
+       .map_err(Error::I2c)
+}
 
 #[cfg(test)]
 mod tests {
@@ -219,13 +378,13 @@ mod tests {
 
     const DEVICE_ADDRESS : u8 = 0x50;
 
-    fn setup<'a>() -> At24cx<hal::I2cMock<'a>> {
+    fn setup<'a>() -> At24cx<hal::I2cMock<'a>, ic::AT24C256> {
         let mut dev = hal::I2cMock::new();
         dev.set_read_data(&[0xAB]);
-        At24cx::new(dev, DEVICE_ADDRESS)
+        At24cx::new_at24c256(dev, DEVICE_ADDRESS)
     }
 
-    fn check_sent_data(eeprom: At24cx<hal::I2cMock>, data: &[u8]) {
+    fn check_sent_data(eeprom: At24cx<hal::I2cMock, ic::AT24C256>, data: &[u8]) {
         let dev = eeprom.destroy();
         assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
         assert_eq!(dev.get_write_data(), &data[..]);
