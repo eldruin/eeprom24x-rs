@@ -23,11 +23,11 @@
 //! extern crate at24cxxx;
 //!
 //! use hal::{I2cdev};
-//! use at24cxxx::At24cxxx;
+//! use at24cxxx::{At24cxxx, SlaveAddr};
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let address = 0b101_0000;
+//! let address = SlaveAddr::default().addr();
 //! let mut eeprom = At24cxxx::new(dev, address);
 //! # }
 //! ```
