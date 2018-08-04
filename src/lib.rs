@@ -13,7 +13,9 @@ use hal::blocking::i2c::{Write, WriteRead};
 #[derive(Debug)]
 pub enum Error<E> {
     /// I²C bus error
-    I2c(E)
+    I2c(E),
+    /// Too much data passed for a write
+    TooMuchData
 }
 
 /// AT24CXXX driver
@@ -47,6 +49,21 @@ where
         let payload = [address[0], address[1], data];
         self.i2c
             .write(self.address, &payload)
+            .map_err(Error::I2c)
+    }
+
+    /// Write up to a page (64 bytes)
+    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+        const PAGE_SIZE : usize = 64;
+        if data.len() > PAGE_SIZE {
+            return Err(Error::TooMuchData);
+        }
+        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
+        payload[0] = address[0];
+        payload[1] = address[1];
+        payload[2..=(1+data.len())].copy_from_slice(&data);
+        self.i2c
+            .write(self.address, &payload[..=(1 + data.len())])
             .map_err(Error::I2c)
     }
 
@@ -100,6 +117,44 @@ mod tests {
         let dev = eeprom.destroy();
         assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
         assert_eq!(dev.get_write_data(), &[address[0], address[1], data]);
+    }
+
+    #[test]
+    fn cannot_write_too_big_page() {
+        let mut eeprom = setup();
+        match eeprom.write_page(&[0, 0], &[0; 65]) {
+            Err(Error::TooMuchData) => {},
+            _ => panic!("Error::TooMuchData not returned.")
+        }
+    }
+
+    #[test]
+    fn sends_correct_parameters_for_page_write() {
+        let mut eeprom = setup();
+        let address = [0x12, 0x34];
+        let data = [0xCD];
+        eeprom.write_page(&address, &data).unwrap();
+        let dev = eeprom.destroy();
+        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
+        assert_eq!(dev.get_write_data(), &[address[0], address[1], data[0]]);
+    }
+
+    #[test]
+    fn can_write_page() {
+        // cannot write a full page with 64 bytes because the write buffer
+        // in embedded-hal-mock is limited to 64 bytes and the address
+        // is prepended to the data.
+        let mut eeprom = setup();
+        let address = [0x12, 0x34];
+        let data = [0xCD; 62];
+        eeprom.write_page(&address, &data).unwrap();
+        let dev = eeprom.destroy();
+
+        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
+        let mut payload = [0xCD; 64];
+        payload[0] = address[0];
+        payload[1] = address[1];
+        assert_eq!(dev.get_write_data(), &payload[..]);
     }
 }
 
