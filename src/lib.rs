@@ -185,7 +185,12 @@ where
     pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
         const PAGE_SIZE : usize = 64;
         if data.len() > PAGE_SIZE {
+            // This would actually be supported by the EEPROM but
+            // the data would be overwritten
             return Err(Error::TooMuchData);
+        }
+        if data.len() == 0 {
+            return Ok(());
         }
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
         payload[0] = address[0];
@@ -248,6 +253,15 @@ mod tests {
         let data = 0xCD;
         eeprom.write_byte(&address, data).unwrap();
         check_sent_data(eeprom, &[address[0], address[1], data]);
+    }
+
+    #[test]
+    fn write_empty_data_does_nothing() {
+        let mut eeprom = setup();
+        eeprom.write_page(&[0, 0], &[]).unwrap();
+        let dev = eeprom.destroy();
+        assert_eq!(dev.get_last_address(), None);
+        assert_eq!(dev.get_write_data(), &[]);
     }
 
     #[test]
