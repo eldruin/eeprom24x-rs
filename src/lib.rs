@@ -60,3 +60,46 @@ where
 }
 
 
+#[cfg(test)]
+mod tests {
+    extern crate embedded_hal_mock as hal;
+
+    use super::*;
+
+    const DEVICE_ADDRESS : u8 = 0x50;
+
+    fn setup<'a>() -> At24cxxx<hal::I2cMock<'a>> {
+        let mut dev = hal::I2cMock::new();
+        dev.set_read_data(&[0xAB]);
+        At24cxxx::new(dev, DEVICE_ADDRESS)
+    }
+
+    #[test]
+    fn sends_correct_parameters_for_byte_read() {
+        let mut eeprom = setup();
+        let address = [0x12, 0x34];
+        eeprom.read_byte(&address).unwrap();
+        let dev = eeprom.destroy();
+        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
+        assert_eq!(dev.get_write_data(), &address);
+    }
+
+    #[test]
+    fn can_read_byte() {
+        let mut eeprom = setup();
+        let data = eeprom.read_byte(&[0, 0]).unwrap();
+        assert_eq!(data, 0xAB);
+    }
+
+    #[test]
+    fn sends_correct_parameters_for_byte_write() {
+        let mut eeprom = setup();
+        let address = [0x12, 0x34];
+        let data = 0xCD;
+        eeprom.write_byte(&address, data).unwrap();
+        let dev = eeprom.destroy();
+        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
+        assert_eq!(dev.get_write_data(), &[address[0], address[1], data]);
+    }
+}
+

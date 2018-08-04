@@ -16,5 +16,8 @@ default = []
 [dependencies]
 embedded-hal = "0.2"
 
+[dev-dependencies]
+embedded-hal-mock = "0.2"
+
 [profile.release]
 lto = true
