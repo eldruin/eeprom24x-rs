@@ -91,14 +91,18 @@ mod tests {
         At24cxxx::new(dev, DEVICE_ADDRESS)
     }
 
+    fn check_sent_data(eeprom: At24cxxx<hal::I2cMock>, data: &[u8]) {
+        let dev = eeprom.destroy();
+        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
+        assert_eq!(dev.get_write_data(), &data[..]);
+    }
+
     #[test]
     fn sends_correct_parameters_for_byte_read() {
         let mut eeprom = setup();
         let address = [0x12, 0x34];
         eeprom.read_byte(&address).unwrap();
-        let dev = eeprom.destroy();
-        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
-        assert_eq!(dev.get_write_data(), &address);
+        check_sent_data(eeprom, &address);
     }
 
     #[test]
@@ -114,9 +118,7 @@ mod tests {
         let address = [0x12, 0x34];
         let data = 0xCD;
         eeprom.write_byte(&address, data).unwrap();
-        let dev = eeprom.destroy();
-        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
-        assert_eq!(dev.get_write_data(), &[address[0], address[1], data]);
+        check_sent_data(eeprom, &[address[0], address[1], data]);
     }
 
     #[test]
@@ -134,9 +136,7 @@ mod tests {
         let address = [0x12, 0x34];
         let data = [0xCD];
         eeprom.write_page(&address, &data).unwrap();
-        let dev = eeprom.destroy();
-        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
-        assert_eq!(dev.get_write_data(), &[address[0], address[1], data[0]]);
+        check_sent_data(eeprom, &[address[0], address[1], data[0]]);
     }
 
     #[test]
@@ -148,13 +148,11 @@ mod tests {
         let address = [0x12, 0x34];
         let data = [0xCD; 62];
         eeprom.write_page(&address, &data).unwrap();
-        let dev = eeprom.destroy();
 
-        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
         let mut payload = [0xCD; 64];
         payload[0] = address[0];
         payload[1] = address[1];
-        assert_eq!(dev.get_write_data(), &payload[..]);
+        check_sent_data(eeprom, &payload);
     }
 }
 
