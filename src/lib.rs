@@ -1,5 +1,36 @@
-//! This is a platform agnostic Rust driver for the AT24CXXX serial EEPROM,
+//! This is a platform agnostic Rust driver for the AT24CXXX series serial EEPROM,
 //! based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
+//!
+//! Can be used at least with the devices AT24C32, AT24C64 and AT24C256.
+//!
+//! ## The device AT24C256
+//!
+//! The Atmel AT24C256C provides 262,144-bits of Serial Electrically Erasable and
+//! Programmable Read-Only Memory (EEPROM) organized as 32,768 words of
+//! 8 bits each.
+//!
+//! - Datasheet [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf)
+//!
+//! ## Usage
+//!
+//! ### Instantiating
+//!
+//! Import this crate and an `embedded_hal` implementation, then instantiate
+//! the device:
+//!
+//! ```no_run
+//! extern crate linux_embedded_hal as hal;
+//! extern crate at24cxxx;
+//!
+//! use hal::{I2cdev};
+//! use at24cxxx::At24cxxx;
+//!
+//! # fn main() {
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let address = 0b101_0000;
+//! let mut eeprom = At24cxxx::new(dev, address);
+//! # }
+//! ```
 
 #![deny(unsafe_code)]
 #![deny(missing_docs)]

@@ -2,12 +2,18 @@
 name = "at24cxxx"
 version = "0.1.0"
 authors = ["Diego Barrios Romero <eldruin@gmail.com>"]
+repository = "https://github.com/eldruin/at24cxxx-rs"
 license = "MIT OR Apache-2.0"
-description = "Platform-agnostic Rust driver for the AT24CXXX Serial EEPROM."
+description = "Platform-agnostic Rust driver for the AT24CXXX series serial EEPROM."
+readme = "README.md"
+keywords = ["at24cxxx", "at24c32", "at24c64", "at24c256", "atmel", "driver", "eeprom", "embedded-hal-driver"]
 categories = ["embedded", "hardware-support", "no-std"]
 include = [
     "**/*.rs",
     "Cargo.toml",
+    "README.md",
+    "LICENSE-MIT",
+    "LICENSE-APACHE",
 ]
 
 [features]
