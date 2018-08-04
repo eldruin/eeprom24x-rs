@@ -48,6 +48,26 @@
 //! let mut eeprom = At24cxxx::new(dev, address);
 //! # }
 //! ```
+//!
+//! ### Writting and reading a byte
+//!
+//! ```no_run
+//! extern crate linux_embedded_hal as hal;
+//! extern crate at24cxxx;
+//!
+//! use hal::{I2cdev};
+//! use at24cxxx::{At24cxxx, SlaveAddr};
+//!
+//! # fn main() {
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let mut eeprom = At24cxxx::new(dev, SlaveAddr::default().addr());
+//! let address = [0x12, 0x34];
+//! let data = 0xAB;
+//! eeprom.write_byte(&address, data);
+//! let retrieved_data = eeprom.read_byte(&address);
+//! # }
+//! ```
+
 
 #![deny(unsafe_code)]
 #![deny(missing_docs)]
