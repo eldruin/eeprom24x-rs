@@ -68,6 +68,25 @@
 //! let retrieved_data = eeprom.read_byte(&address);
 //! # }
 //! ```
+//!
+//! ### Writting a page
+//!
+//! ```no_run
+//! extern crate linux_embedded_hal as hal;
+//! extern crate at24cxxx;
+//!
+//! use hal::{I2cdev};
+//! use at24cxxx::{At24cxxx, SlaveAddr};
+//!
+//! # fn main() {
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let mut eeprom = At24cxxx::new(dev, SlaveAddr::default().addr());
+//! let address = [0x12, 0x34];
+//! let data = [0xAB; 64];
+//! eeprom.write_page(&address, &data);
+//! // EEPROM enters internally-timed write cycle. Will not respond for some time.
+//! # }
+//! ```
 
 
 #![deny(unsafe_code)]
