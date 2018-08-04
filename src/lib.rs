@@ -64,6 +64,7 @@
 //! let address = [0x12, 0x34];
 //! let data = 0xAB;
 //! eeprom.write_byte(&address, data);
+//! // EEPROM enters internally-timed write cycle. Will not respond for some time.
 //! let retrieved_data = eeprom.read_byte(&address);
 //! # }
 //! ```
@@ -143,7 +144,12 @@ where
         self.i2c
     }
 
-    /// Write a single byte into an address.
+    /// Write a single byte in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
     pub fn write_byte(&mut self, address: &[u8; 2], data: u8) -> Result<(), Error<E>> {
         let payload = [address[0], address[1], data];
         self.i2c
@@ -151,7 +157,12 @@ where
             .map_err(Error::I2c)
     }
 
-    /// Write up to a page (64 bytes)
+    /// Write up to a page (64 bytes) starting in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
     pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
         const PAGE_SIZE : usize = 64;
         if data.len() > PAGE_SIZE {
