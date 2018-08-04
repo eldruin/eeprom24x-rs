@@ -49,6 +49,37 @@ pub enum Error<E> {
     TooMuchData
 }
 
+/// Possible slave addresses
+pub enum SlaveAddr {
+    /// Default slave address
+    Default,
+    /// Alternative slave address providing bit values for A2, A1 and A0
+    Alternative(bool, bool, bool)
+}
+
+impl Default for SlaveAddr {
+    fn default() -> Self {
+        SlaveAddr::Default
+    }
+}
+
+impl SlaveAddr {
+    /// Get slave address as u8
+    pub fn addr(&self) -> u8 {
+        let default_address = 0b101_0000;
+        match self {
+            SlaveAddr::Default => default_address,
+            SlaveAddr::Alternative(a2, a1, a0) =>
+                default_address    |
+                ((*a2 as u8) << 2) |
+                ((*a1 as u8) << 1) |
+                  *a0 as u8
+        }
+    }
+    
+
+}
+
 /// AT24CXXX driver
 #[derive(Debug, Default)]
 pub struct At24cxxx<I2C> {
@@ -184,6 +215,20 @@ mod tests {
         payload[0] = address[0];
         payload[1] = address[1];
         check_sent_data(eeprom, &payload);
+    }
+
+    #[test]
+    fn default_address_is_correct() {
+        assert_eq!(0b101_0000, SlaveAddr::default().addr());
+    }
+    
+    #[test]
+    fn can_generate_alternative_addresses() {
+        assert_eq!(0b101_0000, SlaveAddr::Alternative(false, false, false).addr());
+        assert_eq!(0b101_0001, SlaveAddr::Alternative(false, false,  true).addr());
+        assert_eq!(0b101_0010, SlaveAddr::Alternative(false,  true, false).addr());
+        assert_eq!(0b101_0100, SlaveAddr::Alternative( true, false, false).addr());
+        assert_eq!(0b101_0111, SlaveAddr::Alternative( true,  true,  true).addr());
     }
 }
 
