@@ -31,6 +31,23 @@
 //! let mut eeprom = At24cxxx::new(dev, address);
 //! # }
 //! ```
+//!
+//! ### Providing an alternative address
+//!
+//! ```no_run
+//! extern crate linux_embedded_hal as hal;
+//! extern crate at24cxxx;
+//!
+//! use hal::{I2cdev};
+//! use at24cxxx::{At24cxxx, SlaveAddr};
+//!
+//! # fn main() {
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let (a2, a1, a0) = (false, false, true);
+//! let address = SlaveAddr::Alternative(a2, a1, a0).addr();
+//! let mut eeprom = At24cxxx::new(dev, address);
+//! # }
+//! ```
 
 #![deny(unsafe_code)]
 #![deny(missing_docs)]
