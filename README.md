@@ -13,7 +13,7 @@ Datasheet: [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-856
 
 - [x] Random address single byte read
 - [ ] Current address read
-- [ ] Sequential read
+- [x] Sequential read
 - [x] Byte write
 - [x] Page write
 

@@ -214,6 +214,13 @@ where
             .write_read(self.address, &[address[0], address[1]], &mut data)
             .map_err(Error::I2c).and(Ok(data[0]))
     }
+
+    /// Read starting in an address as many bytes as necessary to fill the data array provided.
+    pub fn read_data(&mut self, address: &[u8; 2], data: &mut [u8]) -> Result<(), Error<E>> {
+        self.i2c
+            .write_read(self.address, &[address[0], address[1]], data)
+            .map_err(Error::I2c)
+    }
 }
 
 impl<I2C, E> At24cx<I2C, ic::AT24C32>
@@ -415,7 +422,7 @@ mod tests {
 
     fn setup<'a>() -> At24cx<hal::I2cMock<'a>, ic::AT24C256> {
         let mut dev = hal::I2cMock::new();
-        dev.set_read_data(&[0xAB]);
+        dev.set_read_data(&[0xAB, 0xCD, 0xEF]);
         At24cx::new_at24c256(dev, DEVICE_ADDRESS)
     }
 
@@ -438,6 +445,14 @@ mod tests {
         let mut eeprom = setup();
         let data = eeprom.read_byte(&[0, 0]).unwrap();
         assert_eq!(data, 0xAB);
+    }
+
+    #[test]
+    fn can_read_array() {
+        let mut eeprom = setup();
+        let mut data = [0; 3];
+        eeprom.read_data(&[0, 0], &mut data).unwrap();
+        assert_eq!(data, [0xAB, 0xCD, 0xEF]);
     }
 
     #[test]
