@@ -1,15 +1,50 @@
 //! This is a platform agnostic Rust driver for the AT24CX series serial EEPROM,
 //! based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 //!
-//! Can be used at least with the devices AT24C32, AT24C64 and AT24C256.
+//! Can be used with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
 //!
-//! ## The device AT24C256
+//! ## The devices
 //!
-//! The Atmel AT24C256C provides 262,144-bits of Serial Electrically Erasable and
-//! Programmable Read-Only Memory (EEPROM) organized as 32,768 words of
-//! 8 bits each.
+//! These devices provides a number of bits of serial electrically erasable and
+//! programmable read only memory (EEPROM) organized as a number of words of 8 bits
+//! each. The devices' cascadable feature allows up to 8 devices to share a common
+//! 2-wire bus. The devices are optimized for use in many industrial and commercial
+//! applications where low power and low voltage operation are essential
+//!
+//! ### AT24C32
+//!
+//! Provides 32,768 bits of EEPROM organized as 4096 words of 8 bits each.
+//! The memory page size is 32 bits.
+//!
+//! - Datasheet [AT24C32/AT24C64](http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf)
+//!
+//! ### AT24C64
+//!
+//! Provides 65,536 bits of EEPROM organized as 8192 words of 8 bits each.
+//! The memory page size is 32 bits.
+//!
+//! - Datasheet [AT24C32/AT24C64](http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf)
+//!
+//! ### AT24C128
+//!
+//! Provides 131,072 bits of EEPROM organized as 16,384 words of 8 bits each.
+//! The memory page size is 64 bits.
+//!
+//! - Datasheet [AT24C128C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf)
+//!
+//! ### AT24C256
+//!
+//! Provides 262,144 bits of EEPROM organized as 32,768 words of 8 bits each.
+//! The memory page size is 64 bits.
 //!
 //! - Datasheet [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf)
+//!
+//! ### AT24C512
+//!
+//! Provides 524,288 bits of EEPROM organized as 65,536 words of 8 bits each.
+//! The memory page size is 128 bits.
+//!
+//! - Datasheet [AT24C512C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf)
 //!
 //! ## Usage
 //!
