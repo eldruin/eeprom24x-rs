@@ -3,11 +3,20 @@
 This is a platform agnostic Rust driver for the AT24CX series serial EEPROM,
 based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 
-Can be used at least with the devices AT24C32, AT24C64 and AT24C256.
+Can be used at least with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
 
-## The Device
+## The devices
+These devices provides a number of bits of serial electrically erasable and
+programmable read only memory (EEPROM) organized as a number of words of 8 bits
+each. The devices' cascadable feature allows up to 8 devices to share a common
+2-wire bus. The devices are optimized for use in many industrial and commercial
+applications where low power and low voltage operation are essential.
 
-Datasheet: [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf)
+Datasheets:
+- [AT24C32/AT24C64](http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf)
+- [AT24C128C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf)
+- [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf)
+- [AT24C512C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf)
 
 ## Status
 
