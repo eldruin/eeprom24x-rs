@@ -9,7 +9,7 @@
 //! programmable read only memory (EEPROM) organized as a number of words of 8 bits
 //! each. The devices' cascadable feature allows up to 8 devices to share a common
 //! 2-wire bus. The devices are optimized for use in many industrial and commercial
-//! applications where low power and low voltage operation are essential
+//! applications where low power and low voltage operation are essential.
 //!
 //! ### AT24C32
 //!
