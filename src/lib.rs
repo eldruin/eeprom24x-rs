@@ -132,7 +132,7 @@ extern crate embedded_hal as hal;
 use hal::blocking::i2c::{Write, WriteRead};
 use core::marker::PhantomData;
 
-pub mod ic;
+mod ic;
 
 /// All possible errors in this crate
 #[derive(Debug)]
