@@ -153,6 +153,7 @@ pub enum SlaveAddr {
 }
 
 impl Default for SlaveAddr {
+    /// Default slave address
     fn default() -> Self {
         SlaveAddr::Default(0b101_0000)
     }
