@@ -138,7 +138,7 @@ mod ic;
 #[derive(Debug)]
 pub enum Error<E> {
     /// I²C bus error
-    I2c(E),
+    I2C(E),
     /// Too much data passed for a write
     TooMuchData
 }
@@ -203,7 +203,7 @@ where
         let payload = [address[0], address[1], data];
         self.i2c
             .write(self.address.addr(), &payload)
-            .map_err(Error::I2c)
+            .map_err(Error::I2C)
     }
 
     /// Read a single byte from an address.
@@ -211,14 +211,14 @@ where
         let mut data = [0; 1];
         self.i2c
             .write_read(self.address.addr(), &[address[0], address[1]], &mut data)
-            .map_err(Error::I2c).and(Ok(data[0]))
+            .map_err(Error::I2C).and(Ok(data[0]))
     }
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
     pub fn read_data(&mut self, address: &[u8; 2], data: &mut [u8]) -> Result<(), Error<E>> {
         self.i2c
             .write_read(self.address.addr(), &[address[0], address[1]], data)
-            .map_err(Error::I2c)
+            .map_err(Error::I2C)
     }
 }
 
@@ -408,7 +408,7 @@ fn write_payload<I2C, E>(device_address: &SlaveAddr, address: &[u8; 2],
     payload[1] = address[1];
     payload[2..=(1+data.len())].copy_from_slice(&data);
     i2c.write(device_address.addr(), &payload[..=(1 + data.len())])
-       .map_err(Error::I2c)
+       .map_err(Error::I2C)
 }
 
 #[cfg(test)]
