@@ -62,7 +62,7 @@
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let address = SlaveAddr::default().addr();
+//! let address = SlaveAddr::default();
 //! let mut eeprom = At24cx::new_at24c256(dev, address);
 //! # }
 //! ```
@@ -79,7 +79,7 @@
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let (a2, a1, a0) = (false, false, true);
-//! let address = SlaveAddr::Alternative(a2, a1, a0).addr();
+//! let address = SlaveAddr::Alternative(a2, a1, a0);
 //! let mut eeprom = At24cx::new_at24c256(dev, address);
 //! # }
 //! ```
@@ -95,7 +95,7 @@
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default().addr());
+//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default());
 //! let address = [0x12, 0x34];
 //! let data = 0xAB;
 //! eeprom.write_byte(&address, data);
@@ -115,7 +115,7 @@
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default().addr());
+//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default());
 //! let address = [0x12, 0x34];
 //! let data = [0xAB; 64];
 //! eeprom.write_page(&address, &data);
@@ -144,29 +144,29 @@ pub enum Error<E> {
 }
 
 /// Possible slave addresses
+#[derive(Debug)]
 pub enum SlaveAddr {
     /// Default slave address
-    Default,
+    Default(u8),
     /// Alternative slave address providing bit values for A2, A1 and A0
     Alternative(bool, bool, bool)
 }
 
 impl Default for SlaveAddr {
     fn default() -> Self {
-        SlaveAddr::Default
+        SlaveAddr::Default(0b101_0000)
     }
 }
 
 impl SlaveAddr {
     /// Get slave address as u8
     pub fn addr(&self) -> u8 {
-        let default_address = 0b101_0000;
         match self {
-            SlaveAddr::Default => default_address,
+            SlaveAddr::Default(address) => *address,
             SlaveAddr::Alternative(a2, a1, a0) =>
-                default_address    |
-                ((*a2 as u8) << 2) |
-                ((*a1 as u8) << 1) |
+                SlaveAddr::default().addr()    |
+                ((*a2 as u8) << 2)             |
+                ((*a1 as u8) << 1)             |
                   *a0 as u8
         }
     }
@@ -180,7 +180,7 @@ pub struct At24cx<I2C, IC> {
     /// The concrete I²C device implementation.
     i2c: I2C,
     /// The I²C device address.
-    address: u8,
+    address: SlaveAddr,
 
     _ic: PhantomData<IC>,
 }
@@ -203,7 +203,7 @@ where
     pub fn write_byte(&mut self, address: &[u8; 2], data: u8) -> Result<(), Error<E>> {
         let payload = [address[0], address[1], data];
         self.i2c
-            .write(self.address, &payload)
+            .write(self.address.addr(), &payload)
             .map_err(Error::I2c)
     }
 
@@ -211,14 +211,14 @@ where
     pub fn read_byte(&mut self, address: &[u8; 2]) -> Result<u8, Error<E>> {
         let mut data = [0; 1];
         self.i2c
-            .write_read(self.address, &[address[0], address[1]], &mut data)
+            .write_read(self.address.addr(), &[address[0], address[1]], &mut data)
             .map_err(Error::I2c).and(Ok(data[0]))
     }
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
     pub fn read_data(&mut self, address: &[u8; 2], data: &mut [u8]) -> Result<(), Error<E>> {
         self.i2c
-            .write_read(self.address, &[address[0], address[1]], data)
+            .write_read(self.address.addr(), &[address[0], address[1]], data)
             .map_err(Error::I2c)
     }
 }
@@ -228,7 +228,7 @@ where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c32(i2c: I2C, address: u8) -> Self {
+    pub fn new_at24c32(i2c: I2C, address: SlaveAddr) -> Self {
         At24cx {
             i2c,
             address,
@@ -254,7 +254,7 @@ where
         }
         
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
 }
 
@@ -263,7 +263,7 @@ where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c64(i2c: I2C, address: u8) -> Self {
+    pub fn new_at24c64(i2c: I2C, address: SlaveAddr) -> Self {
         At24cx {
             i2c,
             address,
@@ -289,7 +289,7 @@ where
         }
         
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
 }
 
@@ -299,7 +299,7 @@ where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c128(i2c: I2C, address: u8) -> Self {
+    pub fn new_at24c128(i2c: I2C, address: SlaveAddr) -> Self {
         At24cx {
             i2c,
             address,
@@ -325,7 +325,7 @@ where
         }
         
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
 }
 
@@ -335,7 +335,7 @@ where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c256(i2c: I2C, address: u8) -> Self {
+    pub fn new_at24c256(i2c: I2C, address: SlaveAddr) -> Self {
         At24cx {
             i2c,
             address,
@@ -361,7 +361,7 @@ where
         }
         
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
 }
 
@@ -370,7 +370,7 @@ where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c512(i2c: I2C, address: u8) -> Self {
+    pub fn new_at24c512(i2c: I2C, address: SlaveAddr) -> Self {
         At24cx {
             i2c,
             address,
@@ -396,19 +396,19 @@ where
         }
         
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(self.address, &address, &data, &mut payload, &mut self.i2c)
+        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
 }
 
 
-fn write_payload<I2C, E>(device_address: u8, address: &[u8; 2],
+fn write_payload<I2C, E>(device_address: &SlaveAddr, address: &[u8; 2],
                          data: &[u8], payload: &mut [u8], i2c: &mut I2C) -> Result<(), Error<E>>
     where I2C: Write<Error = E>
 {
     payload[0] = address[0];
     payload[1] = address[1];
     payload[2..=(1+data.len())].copy_from_slice(&data);
-    i2c.write(device_address, &payload[..=(1 + data.len())])
+    i2c.write(device_address.addr(), &payload[..=(1 + data.len())])
        .map_err(Error::I2c)
 }
 
@@ -418,17 +418,16 @@ mod tests {
 
     use super::*;
 
-    const DEVICE_ADDRESS : u8 = 0x50;
 
     fn setup<'a>() -> At24cx<hal::I2cMock<'a>, ic::AT24C256> {
         let mut dev = hal::I2cMock::new();
         dev.set_read_data(&[0xAB, 0xCD, 0xEF]);
-        At24cx::new_at24c256(dev, DEVICE_ADDRESS)
+        At24cx::new_at24c256(dev, SlaveAddr::default())
     }
 
     fn check_sent_data(eeprom: At24cx<hal::I2cMock, ic::AT24C256>, data: &[u8]) {
         let dev = eeprom.destroy();
-        assert_eq!(dev.get_last_address(), Some(DEVICE_ADDRESS));
+        assert_eq!(dev.get_last_address(), Some(0x50));
         assert_eq!(dev.get_write_data(), &data[..]);
     }
 
