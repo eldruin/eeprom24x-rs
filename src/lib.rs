@@ -160,7 +160,7 @@ impl Default for SlaveAddr {
 
 impl SlaveAddr {
     /// Get slave address as u8
-    pub fn addr(&self) -> u8 {
+    fn addr(&self) -> u8 {
         match self {
             SlaveAddr::Default(address) => *address,
             SlaveAddr::Alternative(a2, a1, a0) =>
@@ -170,8 +170,6 @@ impl SlaveAddr {
                   *a0 as u8
         }
     }
-    
-
 }
 
 /// AT24CX driver
