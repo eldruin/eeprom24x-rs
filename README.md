@@ -1,6 +1,6 @@
-# Rust AT24CX Driver
+# Rust 24x EEPROM Driver
 
-This is a platform agnostic Rust driver for the AT24CX series serial EEPROM,
+This is a platform agnostic Rust driver for the 24x series serial EEPROM,
 based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 
 Can be used at least with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.

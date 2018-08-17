@@ -1,4 +1,4 @@
-//! This is a platform agnostic Rust driver for the AT24CX series serial EEPROM,
+//! This is a platform agnostic Rust driver for the 24x series serial EEPROM,
 //! based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 //!
 //! Can be used with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
@@ -55,15 +55,15 @@
 //!
 //! ```no_run
 //! extern crate linux_embedded_hal as hal;
-//! extern crate at24cx;
+//! extern crate eeprom24x;
 //!
 //! use hal::{I2cdev};
-//! use at24cx::{At24cx, SlaveAddr};
+//! use eeprom24x::{Eeprom24x, SlaveAddr};
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let address = SlaveAddr::default();
-//! let mut eeprom = At24cx::new_at24c256(dev, address);
+//! let mut eeprom = Eeprom24x::new_24x256(dev, address);
 //! # }
 //! ```
 //!
@@ -71,16 +71,16 @@
 //!
 //! ```no_run
 //! extern crate linux_embedded_hal as hal;
-//! extern crate at24cx;
+//! extern crate eeprom24x;
 //!
 //! use hal::{I2cdev};
-//! use at24cx::{At24cx, SlaveAddr};
+//! use eeprom24x::{Eeprom24x, SlaveAddr};
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let (a2, a1, a0) = (false, false, true);
 //! let address = SlaveAddr::Alternative(a2, a1, a0);
-//! let mut eeprom = At24cx::new_at24c256(dev, address);
+//! let mut eeprom = Eeprom24x::new_24x256(dev, address);
 //! # }
 //! ```
 //!
@@ -88,14 +88,14 @@
 //!
 //! ```no_run
 //! extern crate linux_embedded_hal as hal;
-//! extern crate at24cx;
+//! extern crate eeprom24x;
 //!
 //! use hal::{I2cdev};
-//! use at24cx::{At24cx, SlaveAddr};
+//! use eeprom24x::{Eeprom24x, SlaveAddr};
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default());
+//! let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
 //! let address = [0x12, 0x34];
 //! let data = 0xAB;
 //! eeprom.write_byte(&address, data);
@@ -108,14 +108,14 @@
 //!
 //! ```no_run
 //! extern crate linux_embedded_hal as hal;
-//! extern crate at24cx;
+//! extern crate eeprom24x;
 //!
 //! use hal::{I2cdev};
-//! use at24cx::{At24cx, SlaveAddr};
+//! use eeprom24x::{Eeprom24x, SlaveAddr};
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut eeprom = At24cx::new_at24c256(dev, SlaveAddr::default());
+//! let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
 //! let address = [0x12, 0x34];
 //! let data = [0xAB; 64];
 //! eeprom.write_page(&address, &data);
@@ -173,9 +173,9 @@ impl SlaveAddr {
     }
 }
 
-/// AT24CX driver
+/// EEPROM24X driver
 #[derive(Debug, Default)]
-pub struct At24cx<I2C, IC> {
+pub struct Eeprom24x<I2C, IC> {
     /// The concrete I²C device implementation.
     i2c: I2C,
     /// The I²C device address.
@@ -184,7 +184,7 @@ pub struct At24cx<I2C, IC> {
     _ic: PhantomData<IC>,
 }
 
-impl<I2C, E, IC> At24cx<I2C, IC>
+impl<I2C, E, IC> Eeprom24x<I2C, IC>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
@@ -222,13 +222,13 @@ where
     }
 }
 
-impl<I2C, E> At24cx<I2C, ic::AT24C32>
+impl<I2C, E> Eeprom24x<I2C, ic::IC24x32>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c32(i2c: I2C, address: SlaveAddr) -> Self {
-        At24cx {
+    pub fn new_24x32(i2c: I2C, address: SlaveAddr) -> Self {
+        Eeprom24x {
             i2c,
             address,
             _ic : PhantomData,
@@ -257,13 +257,13 @@ where
     }
 }
 
-impl<I2C, E> At24cx<I2C, ic::AT24C64>
+impl<I2C, E> Eeprom24x<I2C, ic::IC24x64>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c64(i2c: I2C, address: SlaveAddr) -> Self {
-        At24cx {
+    pub fn new_24x64(i2c: I2C, address: SlaveAddr) -> Self {
+        Eeprom24x {
             i2c,
             address,
             _ic : PhantomData,
@@ -293,13 +293,13 @@ where
 }
 
 
-impl<I2C, E> At24cx<I2C, ic::AT24C128>
+impl<I2C, E> Eeprom24x<I2C, ic::IC24x128>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c128(i2c: I2C, address: SlaveAddr) -> Self {
-        At24cx {
+    pub fn new_24x128(i2c: I2C, address: SlaveAddr) -> Self {
+        Eeprom24x {
             i2c,
             address,
             _ic : PhantomData,
@@ -329,13 +329,13 @@ where
 }
 
 
-impl<I2C, E> At24cx<I2C, ic::AT24C256>
+impl<I2C, E> Eeprom24x<I2C, ic::IC24x256>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c256(i2c: I2C, address: SlaveAddr) -> Self {
-        At24cx {
+    pub fn new_24x256(i2c: I2C, address: SlaveAddr) -> Self {
+        Eeprom24x {
             i2c,
             address,
             _ic : PhantomData,
@@ -364,13 +364,13 @@ where
     }
 }
 
-impl<I2C, E> At24cx<I2C, ic::AT24C512>
+impl<I2C, E> Eeprom24x<I2C, ic::IC24x512>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance
-    pub fn new_at24c512(i2c: I2C, address: SlaveAddr) -> Self {
-        At24cx {
+    pub fn new_24x512(i2c: I2C, address: SlaveAddr) -> Self {
+        Eeprom24x {
             i2c,
             address,
             _ic : PhantomData,
@@ -418,13 +418,13 @@ mod tests {
     use super::*;
 
 
-    fn setup<'a>() -> At24cx<hal::I2cMock<'a>, ic::AT24C256> {
+    fn setup<'a>() -> Eeprom24x<hal::I2cMock<'a>, ic::IC24x256> {
         let mut dev = hal::I2cMock::new();
         dev.set_read_data(&[0xAB, 0xCD, 0xEF]);
-        At24cx::new_at24c256(dev, SlaveAddr::default())
+        Eeprom24x::new_24x256(dev, SlaveAddr::default())
     }
 
-    fn check_sent_data(eeprom: At24cx<hal::I2cMock, ic::AT24C256>, data: &[u8]) {
+    fn check_sent_data(eeprom: Eeprom24x<hal::I2cMock, ic::IC24x256>, data: &[u8]) {
         let dev = eeprom.destroy();
         assert_eq!(dev.get_last_address(), Some(0x50));
         assert_eq!(dev.get_write_data(), &data[..]);
