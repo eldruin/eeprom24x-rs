@@ -27,7 +27,7 @@
 //!
 //! ## Usage
 //!
-//! ### Instantiating
+//! ### Instantiating with the default address
 //!
 //! Import this crate and an `embedded_hal` implementation, then instantiate
 //! the device:
@@ -163,6 +163,7 @@ pub struct Eeprom24x<I2C, IC> {
     _ic: PhantomData<IC>,
 }
 
+/// Common methods
 impl<I2C, E, IC> Eeprom24x<I2C, IC>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
@@ -201,11 +202,12 @@ where
     }
 }
 
+/// Specialization for 24x32 devices (e.g. AT24C32)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x32>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Create a new instance
+    /// Create a new instance of a 24x32 device (e.g. AT24C32)
     pub fn new_24x32(i2c: I2C, address: SlaveAddr) -> Self {
         Eeprom24x {
             i2c,
@@ -236,11 +238,12 @@ where
     }
 }
 
+/// Specialization for 24x64 devices (e.g. AT24C64)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x64>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Create a new instance
+    /// Create a new instance of a 24x64 device (e.g. AT24C64)
     pub fn new_24x64(i2c: I2C, address: SlaveAddr) -> Self {
         Eeprom24x {
             i2c,
@@ -271,12 +274,12 @@ where
     }
 }
 
-
+/// Specialization for 24x128 devices (e.g. AT24C128)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x128>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Create a new instance
+    /// Create a new instance of a 24x128 device (e.g. AT24C128)
     pub fn new_24x128(i2c: I2C, address: SlaveAddr) -> Self {
         Eeprom24x {
             i2c,
@@ -308,11 +311,12 @@ where
 }
 
 
+/// Specialization for 24x256 devices (e.g. AT24C256)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x256>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Create a new instance
+    /// Create a new instance of a 24x256 device (e.g. AT24C256)
     pub fn new_24x256(i2c: I2C, address: SlaveAddr) -> Self {
         Eeprom24x {
             i2c,
@@ -343,11 +347,13 @@ where
     }
 }
 
+
+/// Specialization for 24x512 devices (e.g. AT24C512)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x512>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Create a new instance
+    /// Create a new instance of a 24x512 device (e.g. AT24C512)
     pub fn new_24x512(i2c: I2C, address: SlaveAddr) -> Self {
         Eeprom24x {
             i2c,
