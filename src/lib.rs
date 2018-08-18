@@ -11,40 +11,19 @@
 //! 2-wire bus. The devices are optimized for use in many industrial and commercial
 //! applications where low power and low voltage operation are essential.
 //!
-//! ### AT24C32
+//! | Device | Memory bits | 8-bit words | Page size | Datasheet  |
+//! |--------|-------------|-------------|-----------|------------|
+//! | 24x32  | 32,768      | 4096        | 32 bytes  | [AT24C32]  |
+//! | 24x64  | 65,536      | 8192        | 32 bytes  | [AT24C64]  |
+//! | 24x128 | 131,072     | 16,384      | 64 bytes  | [AT24C128] |
+//! | 24x256 | 262,144     | 32,768      | 64 bytes  | [AT24C256] |
+//! | 24x512 | 524,288     | 65,536      | 128 bytes | [AT24C512] |
 //!
-//! Provides 32,768 bits of EEPROM organized as 4096 words of 8 bits each.
-//! The memory page size is 32 bits.
-//!
-//! - Datasheet [AT24C32/AT24C64](http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf)
-//!
-//! ### AT24C64
-//!
-//! Provides 65,536 bits of EEPROM organized as 8192 words of 8 bits each.
-//! The memory page size is 32 bits.
-//!
-//! - Datasheet [AT24C32/AT24C64](http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf)
-//!
-//! ### AT24C128
-//!
-//! Provides 131,072 bits of EEPROM organized as 16,384 words of 8 bits each.
-//! The memory page size is 64 bits.
-//!
-//! - Datasheet [AT24C128C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf)
-//!
-//! ### AT24C256
-//!
-//! Provides 262,144 bits of EEPROM organized as 32,768 words of 8 bits each.
-//! The memory page size is 64 bits.
-//!
-//! - Datasheet [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf)
-//!
-//! ### AT24C512
-//!
-//! Provides 524,288 bits of EEPROM organized as 65,536 words of 8 bits each.
-//! The memory page size is 128 bits.
-//!
-//! - Datasheet [AT24C512C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf)
+//! [AT24C32]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
+//! [AT24C64]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
+//! [AT24C128]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
+//! [AT24C256]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
+//! [AT24C512]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
 //!
 //! ## Usage
 //!
