@@ -416,6 +416,36 @@ mod tests {
     }
 
     #[test]
+    fn can_create_24x32() {
+        let dev = hal::I2cMock::new();
+        Eeprom24x::new_24x32(dev, SlaveAddr::default());
+    }
+
+    #[test]
+    fn can_create_24x64() {
+        let dev = hal::I2cMock::new();
+        Eeprom24x::new_24x64(dev, SlaveAddr::default());
+    }
+
+    #[test]
+    fn can_create_24x128() {
+        let dev = hal::I2cMock::new();
+        Eeprom24x::new_24x128(dev, SlaveAddr::default());
+    }
+
+    #[test]
+    fn can_create_24x256() {
+        let dev = hal::I2cMock::new();
+        Eeprom24x::new_24x256(dev, SlaveAddr::default());
+    }
+
+    #[test]
+    fn can_create_24x512() {
+        let dev = hal::I2cMock::new();
+        Eeprom24x::new_24x512(dev, SlaveAddr::default());
+    }
+
+    #[test]
     fn sends_correct_parameters_for_byte_read() {
         let mut eeprom = setup();
         let address = [0x12, 0x34];
