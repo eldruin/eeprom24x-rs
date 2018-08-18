@@ -3,6 +3,13 @@
 This is a platform agnostic Rust driver for the 24x series serial EEPROM,
 based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 
+This driver allows you to:
+- Read a single byte from a memory address. See: `read_byte`
+- Read a byte array starting on a memory address. See: `read_data`
+- Read the current memory address (please read notes). See: `read_current_address`
+- Write a byte to a memory address. See: `write_byte`
+- Write a byte array (up to a memory page) to a memory address. See: `write_page`
+
 Can be used at least with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
 
 ## The devices

@@ -1,7 +1,14 @@
 //! This is a platform agnostic Rust driver for the 24x series serial EEPROM,
 //! based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 //!
-//! Can be used with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
+//! This driver allows you to:
+//! - Read a single byte from a memory address: `read_byte`
+//! - Read a byte array starting on a memory address: `read_data`
+//! - Read the current memory address (please read notes): `read_current_address`
+//! - Write a byte to a memory address: `write_byte`
+//! - Write a byte array (up to a memory page) to a memory address: `write_page`
+//!
+//! Can be used at least with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
 //!
 //! ## The devices
 //!
@@ -25,7 +32,13 @@
 //! [AT24C256]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
 //! [AT24C512]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
 //!
-//! ## Usage
+//! ## Usage examples (see also examples folder)
+//!
+//! To create a new instance you can use the `new_<device>` methods.
+//! There are many compatible vendors so the method has a somewhat generic name.  
+//! For example, if you are using an AT24C32, you can create a device by calling
+//! `Eeprom24x::new_24x32(...)`.  
+//! Please refer to the [device table](#the-devices) above for more examples.
 //!
 //! ### Instantiating with the default address
 //!
@@ -42,6 +55,7 @@
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let address = SlaveAddr::default();
+//! // using the AT24C256
 //! let mut eeprom = Eeprom24x::new_24x256(dev, address);
 //! # }
 //! ```
