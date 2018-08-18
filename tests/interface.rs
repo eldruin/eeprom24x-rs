@@ -118,3 +118,10 @@ fn can_write_page() {
     payload[1] = address[1];
     check_sent_data(eeprom, &payload);
 }
+
+#[test]
+fn can_read_current_address() {
+    let mut eeprom = setup();
+    let data = eeprom.read_current_address().unwrap();
+    assert_eq!(0xAB, data);
+}

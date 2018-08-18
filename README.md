@@ -18,14 +18,6 @@ Datasheets:
 - [AT24C256C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf)
 - [AT24C512C](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf)
 
-## Status
-
-- [x] Random address single byte read
-- [ ] Current address read
-- [x] Sequential read
-- [x] Byte write
-- [x] Page write
-
 ## License
 
 Licensed under either of
