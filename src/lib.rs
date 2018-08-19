@@ -140,7 +140,7 @@ pub enum Error<E> {
 #[derive(Debug)]
 pub enum SlaveAddr {
     /// Default slave address
-    Default(u8),
+    Default,
     /// Alternative slave address providing bit values for A2, A1 and A0
     Alternative(bool, bool, bool)
 }
@@ -148,7 +148,7 @@ pub enum SlaveAddr {
 impl Default for SlaveAddr {
     /// Default slave address
     fn default() -> Self {
-        SlaveAddr::Default(0b101_0000)
+        SlaveAddr::Default
     }
 }
 
@@ -156,7 +156,7 @@ impl SlaveAddr {
     /// Get slave address as u8
     fn addr(&self) -> u8 {
         match self {
-            SlaveAddr::Default(address) => *address,
+            SlaveAddr::Default => 0b101_0000,
             SlaveAddr::Alternative(a2, a1, a0) =>
                 SlaveAddr::default().addr()    |
                 ((*a2 as u8) << 2)             |
