@@ -8,6 +8,8 @@ description = "Platform-agnostic Rust driver for the 24x series serial EEPROMs."
 readme = "README.md"
 keywords = ["eeprom", "i2c", "driver", "embedded-hal-driver"]
 categories = ["embedded", "hardware-support", "no-std"]
+homepage = "https://github.com/eldruin/eeprom24x-rs"
+documentation = "https://docs.rs/eeprom24x"
 include = [
     "**/*.rs",
     "Cargo.toml",
