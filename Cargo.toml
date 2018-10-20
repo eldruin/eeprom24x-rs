@@ -23,9 +23,6 @@ include = [
 branch = "master"
 repository = "eldruin/eeprom24x-rs"
 
-[features]
-default = []
-
 [dependencies]
 embedded-hal = "0.2"
 
