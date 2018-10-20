@@ -21,7 +21,7 @@ include = [
 
 [badges.travis-ci]
 branch = "master"
-repository = "eldruin/lm75-rs"
+repository = "eldruin/eeprom24x-rs"
 
 [features]
 default = []
