@@ -19,6 +19,10 @@ include = [
     "LICENSE-APACHE",
 ]
 
+[badges.travis-ci]
+branch = "master"
+repository = "eldruin/lm75-rs"
+
 [features]
 default = []
 

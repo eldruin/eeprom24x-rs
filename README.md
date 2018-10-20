@@ -1,4 +1,4 @@
-# Rust 24x EEPROM Driver [![crates.io](https://img.shields.io/crates/v/eeprom24x.svg)](https://crates.io/crates/eeprom24x) [![Docs](https://docs.rs/eeprom24x/badge.svg)](https://docs.rs/eeprom24x)
+# Rust 24x EEPROM Driver [![crates.io](https://img.shields.io/crates/v/eeprom24x.svg)](https://crates.io/crates/eeprom24x) [![Docs](https://docs.rs/eeprom24x/badge.svg)](https://docs.rs/eeprom24x)  [![Build Status](https://travis-ci.org/eldruin/eeprom24x-rs.svg?branch=master)](https://travis-ci.org/eldruin/eeprom24x-rs)
 
 This is a platform agnostic Rust driver for the 24x series serial EEPROM,
 based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
