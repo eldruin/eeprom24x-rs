@@ -35,9 +35,9 @@
 //! ## Usage examples (see also examples folder)
 //!
 //! To create a new instance you can use the `new_<device>` methods.
-//! There are many compatible vendors so the method has a somewhat generic name.  
+//! There are many compatible vendors so the method has a somewhat generic name.
 //! For example, if you are using an AT24C32, you can create a device by calling
-//! `Eeprom24x::new_24x32(...)`.  
+//! `Eeprom24x::new_24x32(...)`.
 //! Please refer to the [device table](#the-devices) above for more examples.
 //!
 //! ### Instantiating with the default address
@@ -49,8 +49,8 @@
 //! extern crate linux_embedded_hal as hal;
 //! extern crate eeprom24x;
 //!
-//! use hal::{I2cdev};
-//! use eeprom24x::{Eeprom24x, SlaveAddr};
+//! use hal::I2cdev;
+//! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
@@ -66,8 +66,8 @@
 //! extern crate linux_embedded_hal as hal;
 //! extern crate eeprom24x;
 //!
-//! use hal::{I2cdev};
-//! use eeprom24x::{Eeprom24x, SlaveAddr};
+//! use hal::I2cdev;
+//! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
@@ -83,8 +83,8 @@
 //! extern crate linux_embedded_hal as hal;
 //! extern crate eeprom24x;
 //!
-//! use hal::{I2cdev};
-//! use eeprom24x::{Eeprom24x, SlaveAddr};
+//! use hal::I2cdev;
+//! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
@@ -103,8 +103,8 @@
 //! extern crate linux_embedded_hal as hal;
 //! extern crate eeprom24x;
 //!
-//! use hal::{I2cdev};
-//! use eeprom24x::{Eeprom24x, SlaveAddr};
+//! use hal::I2cdev;
+//! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
 //! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
@@ -246,7 +246,7 @@ where
             // the data would be overwritten
             return Err(Error::TooMuchData);
         }
-        
+
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
         write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
@@ -301,7 +301,7 @@ where
             // the data would be overwritten
             return Err(Error::TooMuchData);
         }
-        
+
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
         write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
@@ -337,7 +337,7 @@ where
             // the data would be overwritten
             return Err(Error::TooMuchData);
         }
-        
+
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
         write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
@@ -374,7 +374,7 @@ where
             // the data would be overwritten
             return Err(Error::TooMuchData);
         }
-        
+
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
         write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
@@ -411,7 +411,7 @@ where
             // the data would be overwritten
             return Err(Error::TooMuchData);
         }
-        
+
         let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
         write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
     }
@@ -439,7 +439,7 @@ mod tests {
     fn default_address_is_correct() {
         assert_eq!(0b101_0000, SlaveAddr::default().addr());
     }
-    
+
     #[test]
     fn can_generate_alternative_addresses() {
         assert_eq!(0b101_0000, SlaveAddr::Alternative(false, false, false).addr());
