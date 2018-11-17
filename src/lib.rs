@@ -216,6 +216,23 @@ where
     }
 }
 
+/// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
+impl<I2C, E, IC> Eeprom24x<I2C, IC>
+where
+    I2C: hal::blocking::i2c::Read<Error = E>
+{
+    /// Read the contents of the last address accessed during the last read
+    /// or write operation, _incremented by one_.
+    ///
+    /// Note: This may not be available on your platform.
+    pub fn read_current_address(&mut self) -> Result<u8, Error<E>> {
+        let mut data = [0];
+        self.i2c
+            .read(self.address.addr(), &mut data)
+            .map_err(Error::I2C).and(Ok(data[0]))
+    }
+}
+
 macro_rules! impl_write_page {
     ($PAGE_SIZE:expr) => {
         /// Write up to a page starting in an address.
@@ -255,25 +272,6 @@ where
     }
     impl_write_page!(32);
 }
-
-
-/// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
-impl<I2C, E, IC> Eeprom24x<I2C, IC>
-where
-    I2C: hal::blocking::i2c::Read<Error = E>
-{
-    /// Read the contents of the last address accessed during the last read
-    /// or write operation, _incremented by one_.
-    ///
-    /// Note: This may not be available on your platform.
-    pub fn read_current_address(&mut self) -> Result<u8, Error<E>> {
-        let mut data = [0];
-        self.i2c
-            .read(self.address.addr(), &mut data)
-            .map_err(Error::I2C).and(Ok(data[0]))
-    }
-}
-
 
 /// Specialization for 24x64 devices (e.g. AT24C64)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x64>
