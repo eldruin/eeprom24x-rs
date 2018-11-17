@@ -137,7 +137,7 @@ pub enum Error<E> {
 }
 
 /// Possible slave addresses
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum SlaveAddr {
     /// Default slave address
     Default,
@@ -358,7 +358,6 @@ fn write_payload<I2C, E>(device_address: &SlaveAddr, address: &[u8; 2],
 #[cfg(test)]
 mod tests {
     extern crate embedded_hal_mock as hal;
-
     use super::*;
 
     #[test]
