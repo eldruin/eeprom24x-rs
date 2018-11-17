@@ -216,6 +216,30 @@ where
     }
 }
 
+macro_rules! impl_write_page {
+    ($PAGE_SIZE:expr) => {
+        /// Write up to a page starting in an address.
+        ///
+        /// After writing a byte, the EEPROM enters an internally-timed write cycle
+        /// to the nonvolatile memory.
+        /// During this time all inputs are disabled and the EEPROM will not
+        /// respond until the write is complete.
+        pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+            if data.len() == 0 {
+                return Ok(());
+            }
+            if data.len() > $PAGE_SIZE {
+                // This would actually be supported by the EEPROM but
+                // the data would be overwritten
+                return Err(Error::TooMuchData);
+            }
+
+            let mut payload : [u8; 2 + $PAGE_SIZE] = [0; 2 + $PAGE_SIZE];
+            write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
+        }
+    };
+}
+
 /// Specialization for 24x32 devices (e.g. AT24C32)
 impl<I2C, E> Eeprom24x<I2C, ic::IC24x32>
 where
@@ -229,27 +253,7 @@ where
             _ic : PhantomData,
         }
     }
-
-    /// Write up to a page starting in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-        if data.len() == 0 {
-            return Ok(());
-        }
-        const PAGE_SIZE: usize = 32;
-        if data.len() > PAGE_SIZE {
-            // This would actually be supported by the EEPROM but
-            // the data would be overwritten
-            return Err(Error::TooMuchData);
-        }
-
-        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
-    }
+    impl_write_page!(32);
 }
 
 
@@ -285,26 +289,7 @@ where
         }
     }
 
-    /// Write up to a page starting in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-        if data.len() == 0 {
-            return Ok(());
-        }
-        const PAGE_SIZE: usize = 32;
-        if data.len() > PAGE_SIZE {
-            // This would actually be supported by the EEPROM but
-            // the data would be overwritten
-            return Err(Error::TooMuchData);
-        }
-
-        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
-    }
+    impl_write_page!(32);
 }
 
 /// Specialization for 24x128 devices (e.g. AT24C128)
@@ -321,26 +306,7 @@ where
         }
     }
 
-    /// Write up to a page starting in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-        if data.len() == 0 {
-            return Ok(());
-        }
-        const PAGE_SIZE: usize = 64;
-        if data.len() > PAGE_SIZE {
-            // This would actually be supported by the EEPROM but
-            // the data would be overwritten
-            return Err(Error::TooMuchData);
-        }
-
-        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
-    }
+    impl_write_page!(64);
 }
 
 
@@ -358,26 +324,7 @@ where
         }
     }
 
-    /// Write up to a page starting in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-        if data.len() == 0 {
-            return Ok(());
-        }
-        const PAGE_SIZE: usize = 64;
-        if data.len() > PAGE_SIZE {
-            // This would actually be supported by the EEPROM but
-            // the data would be overwritten
-            return Err(Error::TooMuchData);
-        }
-
-        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
-    }
+    impl_write_page!(64);
 }
 
 
@@ -395,26 +342,7 @@ where
         }
     }
 
-    /// Write up to a page starting in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-        if data.len() == 0 {
-            return Ok(());
-        }
-        const PAGE_SIZE: usize = 128;
-        if data.len() > PAGE_SIZE {
-            // This would actually be supported by the EEPROM but
-            // the data would be overwritten
-            return Err(Error::TooMuchData);
-        }
-
-        let mut payload : [u8; 2 + PAGE_SIZE] = [0; 2 + PAGE_SIZE];
-        write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
-    }
+    impl_write_page!(128);
 }
 
 
