@@ -5,7 +5,9 @@
 [![Build Status](https://travis-ci.org/eldruin/eeprom24x-rs.svg?branch=master)](https://travis-ci.org/eldruin/eeprom24x-rs)
 
 This is a platform agnostic Rust driver for the 24x series serial EEPROM,
-based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
+based on the [`embedded-hal`] traits.
+
+[`embedded-hal`]: https://github.com/rust-embedded/embedded-hal
 
 This driver allows you to:
 - Read a single byte from a memory address. See: `read_byte`
