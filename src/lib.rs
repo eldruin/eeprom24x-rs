@@ -254,7 +254,7 @@ macro_rules! impl_write_page {
             }
 
             let mut payload : [u8; 2 + $PAGE_SIZE] = [0; 2 + $PAGE_SIZE];
-            write_payload(&self.address, &address, &data, &mut payload, &mut self.i2c)
+            write_payload(self.address, *address, &data, &mut payload, &mut self.i2c)
         }
     };
 }
@@ -346,7 +346,7 @@ where
 }
 
 
-fn write_payload<I2C, E>(device_address: &SlaveAddr, address: &[u8; 2],
+fn write_payload<I2C, E>(device_address: SlaveAddr, address: [u8; 2],
                          data: &[u8], payload: &mut [u8], i2c: &mut I2C) -> Result<(), Error<E>>
     where I2C: Write<Error = E>
 {
