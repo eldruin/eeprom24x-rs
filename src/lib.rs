@@ -156,14 +156,14 @@ impl Default for SlaveAddr {
 
 impl SlaveAddr {
     /// Get slave address as u8
-    fn addr(&self) -> u8 {
+    fn addr(self) -> u8 {
         match self {
             SlaveAddr::Default => 0b101_0000,
             SlaveAddr::Alternative(a2, a1, a0) =>
-                SlaveAddr::default().addr()    |
-                ((*a2 as u8) << 2)             |
-                ((*a1 as u8) << 1)             |
-                  *a0 as u8
+                SlaveAddr::default().addr() |
+                ((a2 as u8) << 2)           |
+                ((a1 as u8) << 1)           |
+                  a0 as u8
         }
     }
 }
