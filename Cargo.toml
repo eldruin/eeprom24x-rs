@@ -12,11 +12,11 @@ homepage = "https://github.com/eldruin/eeprom24x-rs"
 documentation = "https://docs.rs/eeprom24x"
 include = [
     "**/*.rs",
-    "Cargo.toml",
-    "CHANGELOG.md",
-    "README.md",
-    "LICENSE-MIT",
-    "LICENSE-APACHE",
+    "/Cargo.toml",
+    "/CHANGELOG.md",
+    "/README.md",
+    "/LICENSE-MIT",
+    "/LICENSE-APACHE",
 ]
 
 [badges.travis-ci]
