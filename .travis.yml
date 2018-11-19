@@ -1,8 +1,28 @@
 language: rust
+# sudo is required to enable kcov to use the personality syscall
+sudo: required
+
+before_install:
+  - git clone https://github.com/eldruin/rust-driver-ci-scripts ci
+  - bash ci/before_install.sh
 
 matrix:
   include:
     - env: TARGET=x86_64-unknown-linux-gnu
+      before_script:
+        - bash ci/coverage_before_script.sh
+      after_success:
+        - bash ci/coverage_after_success.sh
+      addons:
+        apt:
+          packages:
+            - libcurl4-openssl-dev
+            - libelf-dev
+            - libdw-dev
+            - binutils-dev
+            - cmake
+          sources:
+            - kalakris-cmake
 
     - env: TARGET=x86_64-unknown-linux-gnu
       rust: nightly
@@ -28,28 +48,21 @@ matrix:
     - env: TARGET=thumbv7m-none-eabi
       rust: beta
 
-before_install:
-  - set -e
-  - rustup self update
-
 install:
-  - bash ci/install.sh
+  bash ci/install.sh
 
 script:
-  - bash ci/script.sh
+  bash ci/script.sh
 
 after_script: set +e
 
 cache: cargo
-before_cache:
-  # Travis can't cache files that are not readable by "others"
-  - chmod -R a+r $HOME/.cargo
+cache:
+  directories:
+    - /home/travis/.cargo
 
-branches:
-  only:
-    - master
-    - staging
-    - trying
+before_cache:
+  bash ci/before_cache.sh
 
 notifications:
   email:
