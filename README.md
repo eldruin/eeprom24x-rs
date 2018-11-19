@@ -3,6 +3,8 @@
 [![crates.io](https://img.shields.io/crates/v/eeprom24x.svg)](https://crates.io/crates/eeprom24x)
 [![Docs](https://docs.rs/eeprom24x/badge.svg)](https://docs.rs/eeprom24x)
 [![Build Status](https://travis-ci.org/eldruin/eeprom24x-rs.svg?branch=master)](https://travis-ci.org/eldruin/eeprom24x-rs)
+[![Coverage Status](https://coveralls.io/repos/eldruin/eeprom24x-rs/badge.svg?branch=master)](https://coveralls.io/r/eldruin/eeprom24x-rs?branch=master)
+![Maintenance Intention](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
 This is a platform agnostic Rust driver for the 24x series serial EEPROM,
 based on the [`embedded-hal`] traits.
