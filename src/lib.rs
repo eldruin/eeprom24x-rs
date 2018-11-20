@@ -276,7 +276,12 @@ macro_rules! impl_device_with_write_page {
                 }
 
                 let mut payload : [u8; 2 + $page_size] = [0; 2 + $page_size];
-                write_payload(self.address, *address, &data, &mut payload, &mut self.i2c)
+                payload[0] = address[0];
+                payload[1] = address[1];
+                payload[2..=(1+data.len())].copy_from_slice(&data);
+                self.i2c
+                    .write(self.address.addr(), &payload[..=(1 + data.len())])
+                    .map_err(Error::I2C)
             }
         }
     };
@@ -286,17 +291,6 @@ impl_device_with_write_page!("24x64",  AT24C64,  new_24x64,  IC24x64,   32);
 impl_device_with_write_page!("24x128", AT24C128, new_24x128, IC24x128,  64);
 impl_device_with_write_page!("24x256", AT24C256, new_24x256, IC24x256,  64);
 impl_device_with_write_page!("24x512", AT24C512, new_24x512, IC24x512, 128);
-
-fn write_payload<I2C, E>(device_address: SlaveAddr, address: [u8; 2],
-                         data: &[u8], payload: &mut [u8], i2c: &mut I2C) -> Result<(), Error<E>>
-    where I2C: Write<Error = E>
-{
-    payload[0] = address[0];
-    payload[1] = address[1];
-    payload[2..=(1+data.len())].copy_from_slice(&data);
-    i2c.write(device_address.addr(), &payload[..=(1 + data.len())])
-       .map_err(Error::I2C)
-}
 
 #[cfg(test)]
 mod tests {
