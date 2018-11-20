@@ -20,6 +20,8 @@ This driver allows you to:
 
 Can be used at least with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
 
+[Introductory blog post](https://blog.eldruin.com/24x-serial-eeprom-driver-in-rust/)
+
 ## The devices
 These devices provides a number of bits of serial electrically erasable and
 programmable read only memory (EEPROM) organized as a number of words of 8 bits
