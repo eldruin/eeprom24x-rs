@@ -235,116 +235,57 @@ where
     }
 }
 
-macro_rules! impl_write_page {
-    ($PAGE_SIZE:expr) => {
-        /// Write up to a page starting in an address.
-        ///
-        /// After writing a byte, the EEPROM enters an internally-timed write cycle
-        /// to the nonvolatile memory.
-        /// During this time all inputs are disabled and the EEPROM will not
-        /// respond until the write is complete.
-        pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
-            if data.len() == 0 {
-                return Ok(());
-            }
-            if data.len() > $PAGE_SIZE {
-                // This would actually be supported by the EEPROM but
-                // the data would be overwritten
-                return Err(Error::TooMuchData);
+macro_rules! impl_device_with_write_page {
+    ( $dev:expr, $part:ident, $create:ident, $ic:ident, $page_size:expr ) => {
+        impl_device_with_write_page!{
+            @gen [$create, $ic, $page_size,
+            concat!("Specialization for ", $dev, " devices (e.g. ", stringify!($part), ")"),
+            concat!("Create a new instance of a ", $dev, " device (e.g. ", stringify!($part), ")")]
+        }
+    };
+
+    (@gen [$create:ident, $ic:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr] ) => {
+        #[doc = $doc_impl]
+        impl<I2C, E> Eeprom24x<I2C, ic::$ic>
+        where
+            I2C: Write<Error = E> + WriteRead<Error = E>,
+        {
+            #[doc = $doc_new]
+            pub fn $create(i2c: I2C, address: SlaveAddr) -> Self {
+                Eeprom24x {
+                    i2c,
+                    address,
+                    _ic : PhantomData,
+                }
             }
 
-            let mut payload : [u8; 2 + $PAGE_SIZE] = [0; 2 + $PAGE_SIZE];
-            write_payload(self.address, *address, &data, &mut payload, &mut self.i2c)
+            /// Write up to a page starting in an address.
+            ///
+            /// After writing a byte, the EEPROM enters an internally-timed write cycle
+            /// to the nonvolatile memory.
+            /// During this time all inputs are disabled and the EEPROM will not
+            /// respond until the write is complete.
+            pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+                if data.len() == 0 {
+                    return Ok(());
+                }
+                if data.len() > $page_size {
+                    // This would actually be supported by the EEPROM but
+                    // the data would be overwritten
+                    return Err(Error::TooMuchData);
+                }
+
+                let mut payload : [u8; 2 + $page_size] = [0; 2 + $page_size];
+                write_payload(self.address, *address, &data, &mut payload, &mut self.i2c)
+            }
         }
     };
 }
-
-/// Specialization for 24x32 devices (e.g. AT24C32)
-impl<I2C, E> Eeprom24x<I2C, ic::IC24x32>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-{
-    /// Create a new instance of a 24x32 device (e.g. AT24C32)
-    pub fn new_24x32(i2c: I2C, address: SlaveAddr) -> Self {
-        Eeprom24x {
-            i2c,
-            address,
-            _ic : PhantomData,
-        }
-    }
-    impl_write_page!(32);
-}
-
-/// Specialization for 24x64 devices (e.g. AT24C64)
-impl<I2C, E> Eeprom24x<I2C, ic::IC24x64>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-{
-    /// Create a new instance of a 24x64 device (e.g. AT24C64)
-    pub fn new_24x64(i2c: I2C, address: SlaveAddr) -> Self {
-        Eeprom24x {
-            i2c,
-            address,
-            _ic : PhantomData,
-        }
-    }
-
-    impl_write_page!(32);
-}
-
-/// Specialization for 24x128 devices (e.g. AT24C128)
-impl<I2C, E> Eeprom24x<I2C, ic::IC24x128>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-{
-    /// Create a new instance of a 24x128 device (e.g. AT24C128)
-    pub fn new_24x128(i2c: I2C, address: SlaveAddr) -> Self {
-        Eeprom24x {
-            i2c,
-            address,
-            _ic : PhantomData,
-        }
-    }
-
-    impl_write_page!(64);
-}
-
-
-/// Specialization for 24x256 devices (e.g. AT24C256)
-impl<I2C, E> Eeprom24x<I2C, ic::IC24x256>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-{
-    /// Create a new instance of a 24x256 device (e.g. AT24C256)
-    pub fn new_24x256(i2c: I2C, address: SlaveAddr) -> Self {
-        Eeprom24x {
-            i2c,
-            address,
-            _ic : PhantomData,
-        }
-    }
-
-    impl_write_page!(64);
-}
-
-
-/// Specialization for 24x512 devices (e.g. AT24C512)
-impl<I2C, E> Eeprom24x<I2C, ic::IC24x512>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-{
-    /// Create a new instance of a 24x512 device (e.g. AT24C512)
-    pub fn new_24x512(i2c: I2C, address: SlaveAddr) -> Self {
-        Eeprom24x {
-            i2c,
-            address,
-            _ic : PhantomData,
-        }
-    }
-
-    impl_write_page!(128);
-}
-
+impl_device_with_write_page!("24x32",  AT24C32,  new_24x32,  IC24x32,   32);
+impl_device_with_write_page!("24x64",  AT24C64,  new_24x64,  IC24x64,   32);
+impl_device_with_write_page!("24x128", AT24C128, new_24x128, IC24x128,  64);
+impl_device_with_write_page!("24x256", AT24C256, new_24x256, IC24x256,  64);
+impl_device_with_write_page!("24x512", AT24C512, new_24x512, IC24x512, 128);
 
 fn write_payload<I2C, E>(device_address: SlaveAddr, address: [u8; 2],
                          data: &[u8], payload: &mut [u8], i2c: &mut I2C) -> Result<(), Error<E>>
