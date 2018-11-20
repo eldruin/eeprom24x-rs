@@ -261,6 +261,10 @@ macro_rules! impl_device_with_write_page {
 
             /// Write up to a page starting in an address.
             ///
+            /// The maximum amount of data that can be written depends on the page
+            /// size of the device. If too much data is passed, the error
+            /// `Error::TooMuchData` will be returned.
+            ///
             /// After writing a byte, the EEPROM enters an internally-timed write cycle
             /// to the nonvolatile memory.
             /// During this time all inputs are disabled and the EEPROM will not
