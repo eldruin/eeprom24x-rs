@@ -135,8 +135,8 @@
 
 extern crate embedded_hal as hal;
 
-use hal::blocking::i2c::{Write, WriteRead};
 use core::marker::PhantomData;
+use hal::blocking::i2c::{Write, WriteRead};
 
 pub mod ic;
 
@@ -146,7 +146,7 @@ pub enum Error<E> {
     /// I²C bus error
     I2C(E),
     /// Too much data passed for a write
-    TooMuchData
+    TooMuchData,
 }
 
 /// Possible slave addresses
@@ -155,7 +155,7 @@ pub enum SlaveAddr {
     /// Default slave address
     Default,
     /// Alternative slave address providing bit values for A2, A1 and A0
-    Alternative(bool, bool, bool)
+    Alternative(bool, bool, bool),
 }
 
 impl Default for SlaveAddr {
@@ -218,7 +218,8 @@ where
         let mut data = [0; 1];
         self.i2c
             .write_read(self.address.addr(), &[address[0], address[1]], &mut data)
-            .map_err(Error::I2C).and(Ok(data[0]))
+            .map_err(Error::I2C)
+            .and(Ok(data[0]))
     }
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
@@ -232,7 +233,7 @@ where
 /// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
 impl<I2C, E, IC> Eeprom24x<I2C, IC>
 where
-    I2C: hal::blocking::i2c::Read<Error = E>
+    I2C: hal::blocking::i2c::Read<Error = E>,
 {
     /// Read the contents of the last address accessed during the last read
     /// or write operation, _incremented by one_.
@@ -242,7 +243,8 @@ where
         let mut data = [0];
         self.i2c
             .read(self.address.addr(), &mut data)
-            .map_err(Error::I2C).and(Ok(data[0]))
+            .map_err(Error::I2C)
+            .and(Ok(data[0]))
     }
 }
 
@@ -256,7 +258,7 @@ where
         Eeprom24x {
             i2c,
             address,
-            _ic : PhantomData,
+            _ic: PhantomData,
         }
     }
 }
@@ -281,7 +283,7 @@ macro_rules! impl_device_with_write_page {
                 Eeprom24x {
                     i2c,
                     address,
-                    _ic : PhantomData,
+                    _ic: PhantomData,
                 }
             }
 
@@ -305,10 +307,10 @@ macro_rules! impl_device_with_write_page {
                     return Err(Error::TooMuchData);
                 }
 
-                let mut payload : [u8; 2 + $page_size] = [0; 2 + $page_size];
+                let mut payload: [u8; 2 + $page_size] = [0; 2 + $page_size];
                 payload[0] = address[0];
                 payload[1] = address[1];
-                payload[2..=(1+data.len())].copy_from_slice(&data);
+                payload[2..=(1 + data.len())].copy_from_slice(&data);
                 self.i2c
                     .write(self.address.addr(), &payload[..=(1 + data.len())])
                     .map_err(Error::I2C)

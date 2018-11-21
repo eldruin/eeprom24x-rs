@@ -32,5 +32,3 @@ pub struct IC24x256;
 
 /// 24x512 Serial EEPROM like AT24C512
 pub struct IC24x512;
-
-
