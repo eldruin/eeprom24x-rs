@@ -17,6 +17,11 @@ fn destroy<T>(eeprom: Eeprom24x<I2cMock, T>) {
     eeprom.destroy().done();
 }
 
+create!(new_24x00,  IC24x00);
+create!(new_24x01,  IC24x01);
+create!(new_24x02,  IC24x02);
+create!(new_24x04,  IC24x04);
+create!(new_24x08,  IC24x08);
 create!(new_24x16,  IC24x16);
 create!(new_24x32,  IC24x32);
 create!(new_24x64,  IC24x64);
@@ -29,6 +34,11 @@ macro_rules! for_all_ics {
     ($name:ident) => {
         mod $name {
             use super::*;
+            $name!(for_24x00,  new_24x00,  IC24x00);
+            $name!(for_24x01,  new_24x01,  IC24x01);
+            $name!(for_24x02,  new_24x02,  IC24x02);
+            $name!(for_24x04,  new_24x04,  IC24x04);
+            $name!(for_24x08,  new_24x08,  IC24x08);
             $name!(for_24x16,  new_24x16,  IC24x16);
             $name!(for_24x32,  new_24x32,  IC24x32);
             $name!(for_24x64,  new_24x64,  IC24x64);
@@ -39,16 +49,20 @@ macro_rules! for_all_ics {
     }
 }
 
-macro_rules! for_all_ics_with_param {
-    ($name:ident, $v16:expr, $v32:expr, $v64:expr, $v128:expr, $v256:expr, $v512:expr) => {
+macro_rules! for_all_ics_with_page_size {
+    ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x16,  new_24x16,  IC24x16,  $v16);
-            $name!(for_24x32,  new_24x32,  IC24x32,  $v32);
-            $name!(for_24x64,  new_24x64,  IC24x64,  $v64);
-            $name!(for_24x128, new_24x128, IC24x128, $v128);
-            $name!(for_24x256, new_24x256, IC24x256, $v256);
-            $name!(for_24x512, new_24x512, IC24x512, $v512);
+            $name!(for_24x01,  new_24x01,  IC24x01,    8);
+            $name!(for_24x02,  new_24x02,  IC24x02,    8);
+            $name!(for_24x04,  new_24x04,  IC24x04,   16);
+            $name!(for_24x08,  new_24x08,  IC24x08,   16);
+            $name!(for_24x16,  new_24x16,  IC24x16,   16);
+            $name!(for_24x32,  new_24x32,  IC24x32,   32);
+            $name!(for_24x64,  new_24x64,  IC24x64,   32);
+            $name!(for_24x128, new_24x128, IC24x128,  64);
+            $name!(for_24x256, new_24x256, IC24x256,  64);
+            $name!(for_24x512, new_24x512, IC24x512, 128);
         }
     }
 }
@@ -122,7 +136,7 @@ macro_rules! can_write_byte {
 for_all_ics!(can_write_byte);
 
 macro_rules! write_empty_data_does_nothing {
-    ($name:ident, $create:ident, $ic:ident) => {
+    ($name:ident, $create:ident, $ic:ident, $page_size:expr) => {
         #[test]
         fn $name() {
             let mut eeprom = $create(&[]);
@@ -131,10 +145,10 @@ macro_rules! write_empty_data_does_nothing {
         }
     }
 }
-for_all_ics!(write_empty_data_does_nothing);
+for_all_ics_with_page_size!(write_empty_data_does_nothing);
 
 macro_rules! can_write_array {
-    ($name:ident, $create:ident, $ic:ident) => {
+    ($name:ident, $create:ident, $ic:ident, $page_size:expr) => {
         #[test]
         fn $name() {
             let trans = [ I2cTrans::write(DEV_ADDR, vec![0x12, 0x34, 0xAB, 0xCD, 0xEF]) ];
@@ -144,7 +158,7 @@ macro_rules! can_write_array {
         }
     }
 }
-for_all_ics!(can_write_array);
+for_all_ics_with_page_size!(can_write_array);
 
 fn assert_too_much_data<T, E>(result: Result<T, Error<E>>) {
     match result {
@@ -173,7 +187,7 @@ macro_rules! cannot_write_too_big_page {
         }
     }
 }
-for_all_ics_with_param!(cannot_write_too_big_page, 16, 32, 32, 64, 64, 128);
+for_all_ics_with_page_size!(cannot_write_too_big_page);
 
 macro_rules! can_write_whole_page {
     ($name:ident, $create:ident, $ic:ident, $size:expr) => {
@@ -188,4 +202,4 @@ macro_rules! can_write_whole_page {
         }
     }
 }
-for_all_ics_with_param!(can_write_whole_page, 16, 32, 32, 64, 64, 128);
+for_all_ics_with_page_size!(can_write_whole_page);

@@ -22,13 +22,23 @@
 //!
 //! | Device | Memory bits | 8-bit words | Page size | Datasheet  |
 //! |--------|-------------|-------------|-----------|------------|
-//! | 24x16  | 16,384      | 2048        | 16 bytes  | [AT24C16]  |
-//! | 24x32  | 32,768      | 4096        | 32 bytes  | [AT24C32]  |
-//! | 24x64  | 65,536      | 8192        | 32 bytes  | [AT24C64]  |
-//! | 24x128 | 131,072     | 16,384      | 64 bytes  | [AT24C128] |
-//! | 24x256 | 262,144     | 32,768      | 64 bytes  | [AT24C256] |
-//! | 24x512 | 524,288     | 65,536      | 128 bytes | [AT24C512] |
+//! |  24x00 |         128 |          16 |       N/A | [24C00]    |
+//! |  24x01 |       1,024 |         128 |   8 bytes | [AT24C01]  |
+//! |  24x02 |       2,048 |         256 |   8 bytes | [AT24C02]  |
+//! |  24x04 |       4,096 |         512 |  16 bytes | [AT24C04]  |
+//! |  24x08 |       8,192 |       1,024 |  16 bytes | [AT24C08]  |
+//! |  24x16 |      16,384 |       2,048 |  16 bytes | [AT24C16]  |
+//! |  24x32 |      32,768 |       4,096 |  32 bytes | [AT24C32]  |
+//! |  24x64 |      65,536 |       8,192 |  32 bytes | [AT24C64]  |
+//! | 24x128 |     131,072 |      16,384 |  64 bytes | [AT24C128] |
+//! | 24x256 |     262,144 |      32,768 |  64 bytes | [AT24C256] |
+//! | 24x512 |     524,288 |      65,536 | 128 bytes | [AT24C512] |
 //!
+//! [24C00]: http://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
+//! [AT24C01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
+//! [AT24C02]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
+//! [AT24C04]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8896E-SEEPROM-AT24C04D-Datasheet.pdf
+//! [AT24C08]: http://ww1.microchip.com/downloads/en/DeviceDoc/AT24C08D-I2C-Compatible-2-Wire-Serial-EEPROM-20006022A.pdf
 //! [AT24C16]: http://ww1.microchip.com/downloads/en/DeviceDoc/20005858A.pdf
 //! [AT24C32]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
 //! [AT24C64]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
@@ -120,8 +130,7 @@
 //! # }
 //! ```
 
-#![deny(unsafe_code)]
-#![deny(missing_docs)]
+#![deny(missing_docs, unsafe_code, warnings)]
 #![no_std]
 
 extern crate embedded_hal as hal;
@@ -237,6 +246,21 @@ where
     }
 }
 
+/// Specialization for 24x00 devices (e.g. 24C00)
+impl<I2C, E> Eeprom24x<I2C, ic::IC24x00>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+{
+    /// Create a new instance of a 24x00 device (e.g. 24C00)
+    pub fn new_24x00(i2c: I2C, address: SlaveAddr) -> Self {
+        Eeprom24x {
+            i2c,
+            address,
+            _ic : PhantomData,
+        }
+    }
+}
+
 macro_rules! impl_device_with_write_page {
     ( $dev:expr, $part:ident, $create:ident, $ic:ident, $page_size:expr ) => {
         impl_device_with_write_page!{
@@ -292,6 +316,10 @@ macro_rules! impl_device_with_write_page {
         }
     };
 }
+impl_device_with_write_page!("24x01",  AT24C01,  new_24x01,  IC24x01,    8);
+impl_device_with_write_page!("24x02",  AT24C02,  new_24x02,  IC24x02,    8);
+impl_device_with_write_page!("24x04",  AT24C04,  new_24x04,  IC24x04,   16);
+impl_device_with_write_page!("24x08",  AT24C08,  new_24x08,  IC24x08,   16);
 impl_device_with_write_page!("24x16",  AT24C16,  new_24x16,  IC24x16,   16);
 impl_device_with_write_page!("24x32",  AT24C32,  new_24x32,  IC24x32,   32);
 impl_device_with_write_page!("24x64",  AT24C64,  new_24x64,  IC24x64,   32);
