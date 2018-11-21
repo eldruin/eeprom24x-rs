@@ -17,7 +17,7 @@ fn destroy<T>(eeprom: Eeprom24x<I2cMock, T>) {
     eeprom.destroy().done();
 }
 
-
+create!(new_24x16,  IC24x16);
 create!(new_24x32,  IC24x32);
 create!(new_24x64,  IC24x64);
 create!(new_24x128, IC24x128);
@@ -29,6 +29,7 @@ macro_rules! for_all_ics {
     ($name:ident) => {
         mod $name {
             use super::*;
+            $name!(for_24x16,  new_24x16,  IC24x16);
             $name!(for_24x32,  new_24x32,  IC24x32);
             $name!(for_24x64,  new_24x64,  IC24x64);
             $name!(for_24x128, new_24x128, IC24x128);
@@ -39,9 +40,10 @@ macro_rules! for_all_ics {
 }
 
 macro_rules! for_all_ics_with_param {
-    ($name:ident, $v32:expr, $v64:expr, $v128:expr, $v256:expr, $v512:expr) => {
+    ($name:ident, $v16:expr, $v32:expr, $v64:expr, $v128:expr, $v256:expr, $v512:expr) => {
         mod $name {
             use super::*;
+            $name!(for_24x16,  new_24x16,  IC24x16,  $v16);
             $name!(for_24x32,  new_24x32,  IC24x32,  $v32);
             $name!(for_24x64,  new_24x64,  IC24x64,  $v64);
             $name!(for_24x128, new_24x128, IC24x128, $v128);
@@ -171,7 +173,7 @@ macro_rules! cannot_write_too_big_page {
         }
     }
 }
-for_all_ics_with_param!(cannot_write_too_big_page, 32, 32, 64, 64, 128);
+for_all_ics_with_param!(cannot_write_too_big_page, 16, 32, 32, 64, 64, 128);
 
 macro_rules! can_write_whole_page {
     ($name:ident, $create:ident, $ic:ident, $size:expr) => {
@@ -186,4 +188,4 @@ macro_rules! can_write_whole_page {
         }
     }
 }
-for_all_ics_with_param!(can_write_whole_page, 32, 32, 64, 64, 128);
+for_all_ics_with_param!(can_write_whole_page, 16, 32, 32, 64, 64, 128);

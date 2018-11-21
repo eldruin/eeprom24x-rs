@@ -1,5 +1,8 @@
 //! Supported ICs (Integrated Circuits)
 
+/// 24x16 Serial EEPROM like AT24C16
+pub struct IC24x16;
+
 /// 24x32 Serial EEPROM like AT24C32
 pub struct IC24x32;
 

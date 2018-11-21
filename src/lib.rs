@@ -22,12 +22,14 @@
 //!
 //! | Device | Memory bits | 8-bit words | Page size | Datasheet  |
 //! |--------|-------------|-------------|-----------|------------|
+//! | 24x16  | 16,384      | 2048        | 16 bytes  | [AT24C16]  |
 //! | 24x32  | 32,768      | 4096        | 32 bytes  | [AT24C32]  |
 //! | 24x64  | 65,536      | 8192        | 32 bytes  | [AT24C64]  |
 //! | 24x128 | 131,072     | 16,384      | 64 bytes  | [AT24C128] |
 //! | 24x256 | 262,144     | 32,768      | 64 bytes  | [AT24C256] |
 //! | 24x512 | 524,288     | 65,536      | 128 bytes | [AT24C512] |
 //!
+//! [AT24C16]: http://ww1.microchip.com/downloads/en/DeviceDoc/20005858A.pdf
 //! [AT24C32]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
 //! [AT24C64]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
 //! [AT24C128]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
@@ -290,6 +292,7 @@ macro_rules! impl_device_with_write_page {
         }
     };
 }
+impl_device_with_write_page!("24x16",  AT24C16,  new_24x16,  IC24x16,   16);
 impl_device_with_write_page!("24x32",  AT24C32,  new_24x32,  IC24x32,   32);
 impl_device_with_write_page!("24x64",  AT24C64,  new_24x64,  IC24x64,   32);
 impl_device_with_write_page!("24x128", AT24C128, new_24x128, IC24x128,  64);
