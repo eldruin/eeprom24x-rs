@@ -30,18 +30,18 @@ each. The devices' cascadable feature allows up to 8 devices to share a common
 applications where low power and low voltage operation are essential.
 
 | Device | Memory bits | 8-bit words | Page size | Datasheet  |
-|--------|-------------|-------------|-----------|------------|
-|  24x00 |         128 |          16 |       N/A | [24C00]    |
-|  24x01 |       1,024 |         128 |   8 bytes | [AT24C01]  |
-|  24x02 |       2,048 |         256 |   8 bytes | [AT24C02]  |
-|  24x04 |       4,096 |         512 |  16 bytes | [AT24C04]  |
-|  24x08 |       8,192 |       1,024 |  16 bytes | [AT24C08]  |
-|  24x16 |      16,384 |       2,048 |  16 bytes | [AT24C16]  |
-|  24x32 |      32,768 |       4,096 |  32 bytes | [AT24C32]  |
-|  24x64 |      65,536 |       8,192 |  32 bytes | [AT24C64]  |
-| 24x128 |     131,072 |      16,384 |  64 bytes | [AT24C128] |
-| 24x256 |     262,144 |      32,768 |  64 bytes | [AT24C256] |
-| 24x512 |     524,288 |      65,536 | 128 bytes | [AT24C512] |
+|-------:|------------:|------------:|----------:|:-----------|
+|  24x00 |    128 bits |          16 |       N/A | [24C00]    |
+|  24x01 |      1 Kbit |         128 |   8 bytes | [AT24C01]  |
+|  24x02 |      2 Kbit |         256 |   8 bytes | [AT24C02]  |
+|  24x04 |      4 Kbit |         512 |  16 bytes | [AT24C04]  |
+|  24x08 |      8 Kbit |       1,024 |  16 bytes | [AT24C08]  |
+|  24x16 |     16 Kbit |       2,048 |  16 bytes | [AT24C16]  |
+|  24x32 |     32 Kbit |       4,096 |  32 bytes | [AT24C32]  |
+|  24x64 |     64 Kbit |       8,192 |  32 bytes | [AT24C64]  |
+| 24x128 |    128 Kbit |      16,384 |  64 bytes | [AT24C128] |
+| 24x256 |    256 Kbit |      32,768 |  64 bytes | [AT24C256] |
+| 24x512 |    512 Kbit |      65,536 | 128 bytes | [AT24C512] |
 
 [24C00]: http://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
 [AT24C01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
