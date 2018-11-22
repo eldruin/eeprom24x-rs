@@ -68,17 +68,18 @@ as an example. Other devices can be created with similar methods like:
 ``Eeprom24x::new_24x64(...)``.
 
 ```rust
+extern crate eeprom24x;
 extern crate embedded_hal;
 extern crate linux_embedded_hal;
-extern crate eeprom24x;
 
+use eeprom24x::{Eeprom24x, SlaveAddr};
 use embedded_hal::blocking::delay::DelayMs;
-use linux_embedded_hal::{ I2cdev, Delay };
-use eeprom24x::{ Eeprom24x, SlaveAddr };
+use linux_embedded_hal::{Delay, I2cdev};
 
 fn main() {
     let dev = I2cdev::new("/dev/i2c-1").unwrap();
-    let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
+    let address = SlaveAddr::default();
+    let mut eeprom = Eeprom24x::new_24x256(dev, address);
     let memory_address = [0x12, 0x34];
     let data = 0xAB;
 
@@ -86,10 +87,12 @@ fn main() {
 
     Delay.delay_ms(5u16);
 
-    let retrieved_data = eeprom.read_byte(&memory_address).unwrap();
+    let read_data = eeprom.read_byte(memory_address).unwrap();
 
-    println!("Read memory address: [{},{}], retrieved content: {}",
-             memory_address[0], memory_address[1], &retrieved_data);
+    println!(
+        "Read memory address: [{},{}], retrieved content: {}",
+        memory_address[0], memory_address[1], &read_data
+    );
 
     let _dev = eeprom.destroy(); // Get the I2C device back
 }
