@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add support for many more devices.
 
 ### Changed
+- [breaking-change] The addresses are now passed to the methods per value for
+efficiency reasons. i.e. `address: &[u8; 2]` has now become `address: [u8; 2]`
+in all methods. User code should be easy to adapt:
+`eeprom.read_byte(&[0x12, 0x34])` now becomes: `eeprom.read_byte([0x12, 0x34])`.
+
 - [breaking-change] Changed type of parameter of the `Eeprom24x` struct. Now it
 is a marker type for the page size instead of the device name.
 

@@ -109,9 +109,9 @@
 //! let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
 //! let address = [0x12, 0x34];
 //! let data = 0xAB;
-//! eeprom.write_byte(&address, data);
+//! eeprom.write_byte(address, data);
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
-//! let retrieved_data = eeprom.read_byte(&address);
+//! let retrieved_data = eeprom.read_byte(address);
 //! # }
 //! ```
 //!
@@ -129,7 +129,7 @@
 //! let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
 //! let address = [0x12, 0x34];
 //! let data = [0xAB; 64];
-//! eeprom.write_page(&address, &data);
+//! eeprom.write_page(address, &data);
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
 //! # }
 //! ```
@@ -226,7 +226,7 @@ where
     /// to the nonvolatile memory.
     /// During this time all inputs are disabled and the EEPROM will not
     /// respond until the write is complete.
-    pub fn write_byte(&mut self, address: &[u8; 2], data: u8) -> Result<(), Error<E>> {
+    pub fn write_byte(&mut self, address: [u8; 2], data: u8) -> Result<(), Error<E>> {
         let payload = [address[0], address[1], data];
         self.i2c
             .write(self.address.addr(), &payload)
@@ -234,7 +234,7 @@ where
     }
 
     /// Read a single byte from an address.
-    pub fn read_byte(&mut self, address: &[u8; 2]) -> Result<u8, Error<E>> {
+    pub fn read_byte(&mut self, address: [u8; 2]) -> Result<u8, Error<E>> {
         let mut data = [0; 1];
         self.i2c
             .write_read(self.address.addr(), &[address[0], address[1]], &mut data)
@@ -243,7 +243,7 @@ where
     }
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
-    pub fn read_data(&mut self, address: &[u8; 2], data: &mut [u8]) -> Result<(), Error<E>> {
+    pub fn read_data(&mut self, address: [u8; 2], data: &mut [u8]) -> Result<(), Error<E>> {
         self.i2c
             .write_read(self.address.addr(), &[address[0], address[1]], data)
             .map_err(Error::I2C)
@@ -337,7 +337,7 @@ macro_rules! impl_for_page_size {
             /// to the nonvolatile memory.
             /// During this time all inputs are disabled and the EEPROM will not
             /// respond until the write is complete.
-            pub fn write_page(&mut self, address: &[u8; 2], data: &[u8]) -> Result<(), Error<E>> {
+            pub fn write_page(&mut self, address: [u8; 2], data: &[u8]) -> Result<(), Error<E>> {
                 if data.len() == 0 {
                     return Ok(());
                 }

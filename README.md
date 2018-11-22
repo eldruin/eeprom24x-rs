@@ -82,7 +82,7 @@ fn main() {
     let memory_address = [0x12, 0x34];
     let data = 0xAB;
 
-    eeprom.write_byte(&memory_address, data).unwrap();
+    eeprom.write_byte(memory_address, data).unwrap();
 
     Delay.delay_ms(5u16);
 
