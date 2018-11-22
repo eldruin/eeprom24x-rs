@@ -359,23 +359,38 @@ macro_rules! impl_for_page_size {
     };
 }
 
-impl_for_page_size!(B8, 8,
-    ["24x01",  "AT24C01",  new_24x01],
-    ["24x02",  "AT24C02",  new_24x02]);
-impl_for_page_size!(B16, 16,
-    ["24x04",  "AT24C04",  new_24x04],
-    ["24x08",  "AT24C08",  new_24x08],
-    ["24x16",  "AT24C16",  new_24x16]);
-impl_for_page_size!(B32, 32,
-    ["24x32",  "AT24C32",  new_24x32],
-    ["24x64",  "AT24C64",  new_24x64]);
-impl_for_page_size!(B64, 64,
+impl_for_page_size!(
+    B8,
+    8,
+    ["24x01", "AT24C01", new_24x01],
+    ["24x02", "AT24C02", new_24x02]
+);
+impl_for_page_size!(
+    B16,
+    16,
+    ["24x04", "AT24C04", new_24x04],
+    ["24x08", "AT24C08", new_24x08],
+    ["24x16", "AT24C16", new_24x16]
+);
+impl_for_page_size!(
+    B32,
+    32,
+    ["24x32", "AT24C32", new_24x32],
+    ["24x64", "AT24C64", new_24x64]
+);
+impl_for_page_size!(
+    B64,
+    64,
     ["24x128", "AT24C128", new_24x128],
-    ["24x256", "AT24C256", new_24x256]);
+    ["24x256", "AT24C256", new_24x256]
+);
 impl_for_page_size!(B128, 128, ["24x512", "AT24C512", new_24x512]);
-impl_for_page_size!(B256, 256,
+impl_for_page_size!(
+    B256,
+    256,
     ["24xM01", "AT24CM01", new_24xm01],
-    ["24xM02", "AT24CM02", new_24xm02]);
+    ["24xM02", "AT24CM02", new_24xm02]
+);
 
 #[cfg(test)]
 mod tests {
