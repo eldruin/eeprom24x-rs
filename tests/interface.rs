@@ -1,13 +1,13 @@
 extern crate eeprom24x;
-use eeprom24x::{ic, Eeprom24x, Error, SlaveAddr};
+use eeprom24x::{page_size, Eeprom24x, Error, SlaveAddr};
 extern crate embedded_hal_mock as hal;
 use hal::i2c::{Mock as I2cMock, Transaction as I2cTrans};
 
 const DEV_ADDR: u8 = 0b101_0000;
 
 macro_rules! create {
-    ($create:ident, $ic:ident) => {
-        fn $create(transactions: &[I2cTrans]) -> Eeprom24x<I2cMock, ic::$ic> {
+    ($create:ident, $PS:ident) => {
+        fn $create(transactions: &[I2cTrans]) -> Eeprom24x<I2cMock, page_size::$PS> {
             Eeprom24x::$create(I2cMock::new(&transactions), SlaveAddr::default())
         }
     };
@@ -17,17 +17,17 @@ fn destroy<T>(eeprom: Eeprom24x<I2cMock, T>) {
     eeprom.destroy().done();
 }
 
-create!(new_24x00,  IC24x00);
-create!(new_24x01,  IC24x01);
-create!(new_24x02,  IC24x02);
-create!(new_24x04,  IC24x04);
-create!(new_24x08,  IC24x08);
-create!(new_24x16,  IC24x16);
-create!(new_24x32,  IC24x32);
-create!(new_24x64,  IC24x64);
-create!(new_24x128, IC24x128);
-create!(new_24x256, IC24x256);
-create!(new_24x512, IC24x512);
+create!(new_24x00,  No);
+create!(new_24x01,  B8);
+create!(new_24x02,  B8);
+create!(new_24x04,  B16);
+create!(new_24x08,  B16);
+create!(new_24x16,  B16);
+create!(new_24x32,  B32);
+create!(new_24x64,  B32);
+create!(new_24x128, B64);
+create!(new_24x256, B64);
+create!(new_24x512, B128);
 
 
 macro_rules! for_all_ics {

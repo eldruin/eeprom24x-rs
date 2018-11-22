@@ -138,8 +138,6 @@ extern crate embedded_hal as hal;
 use core::marker::PhantomData;
 use hal::blocking::i2c::{Write, WriteRead};
 
-pub mod ic;
-
 /// All possible errors in this crate
 #[derive(Debug)]
 pub enum Error<E> {
@@ -179,19 +177,35 @@ impl SlaveAddr {
     }
 }
 
+/// Page size markers
+pub mod page_size {
+    /// No page write supported. e.g. for AT24x00
+    pub struct No;
+    /// 8-byte pages. e.g. for AT24x01, AT24x02
+    pub struct B8;
+    /// 16-byte pages. e.g. for AT24x04, AT24x08, AT24x16
+    pub struct B16;
+    /// 32-byte pages. e.g. for AT24x32, AT24x64
+    pub struct B32;
+    /// 64-byte pages. e.g. for AT24x128, AT24x256
+    pub struct B64;
+    /// 128-byte pages. e.g. for AT24x512
+    pub struct B128;
+}
+
 /// EEPROM24X driver
 #[derive(Debug, Default)]
-pub struct Eeprom24x<I2C, IC> {
+pub struct Eeprom24x<I2C, PS> {
     /// The concrete I²C device implementation.
     i2c: I2C,
     /// The I²C device address.
     address: SlaveAddr,
 
-    _ic: PhantomData<IC>,
+    _ps: PhantomData<PS>,
 }
 
 /// Common methods
-impl<I2C, E, IC> Eeprom24x<I2C, IC>
+impl<I2C, E, PS> Eeprom24x<I2C, PS>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
@@ -231,7 +245,7 @@ where
 }
 
 /// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
-impl<I2C, E, IC> Eeprom24x<I2C, IC>
+impl<I2C, E, PS> Eeprom24x<I2C, PS>
 where
     I2C: hal::blocking::i2c::Read<Error = E>,
 {
@@ -248,8 +262,8 @@ where
     }
 }
 
-/// Specialization for 24x00 devices (e.g. 24C00)
-impl<I2C, E> Eeprom24x<I2C, ic::IC24x00>
+/// Specialization for devices without page access (e.g. 24C00)
+impl<I2C, E> Eeprom24x<I2C, page_size::No>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
@@ -258,32 +272,52 @@ where
         Eeprom24x {
             i2c,
             address,
-            _ic: PhantomData,
+            _ps: PhantomData,
         }
     }
 }
 
-macro_rules! impl_device_with_write_page {
-    ( $dev:expr, $part:ident, $create:ident, $ic:ident, $page_size:expr ) => {
-        impl_device_with_write_page!{
-            @gen [$create, $ic, $page_size,
-            concat!("Specialization for ", $dev, " devices (e.g. ", stringify!($part), ")"),
-            concat!("Create a new instance of a ", $dev, " device (e.g. ", stringify!($part), ")")]
+macro_rules! impl_create {
+    ( $dev:expr, $part:expr, $create:ident ) => {
+        impl_create!{
+            @gen [$create, concat!("Create a new instance of a ", $dev, " device (e.g. ", $part, ")")]
         }
     };
 
-    (@gen [$create:ident, $ic:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr] ) => {
+    (@gen [$create:ident, $doc:expr] ) => {
+        #[doc = $doc]
+        pub fn $create(i2c: I2C, address: SlaveAddr) -> Self {
+            Self::new(i2c, address)
+        }
+    };
+}
+
+macro_rules! impl_for_page_size {
+    ( $PS:ident, $page_size:expr, $( [ $dev:expr, $part:expr, $create:ident ] ),* ) => {
+        impl_for_page_size!{
+            @gen [$PS, $page_size,
+            concat!("Specialization for devices with a page size of ", stringify!($page_size), " bytes."),
+            concat!("Create generic instance for devices with a page size of ", stringify!($page_size), " bytes."),
+            $( [ $dev, $part, $create ] ),* ]
+        }
+    };
+
+    (@gen [$PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr, $( [ $dev:expr, $part:expr, $create:ident ] ),* ] ) => {
         #[doc = $doc_impl]
-        impl<I2C, E> Eeprom24x<I2C, ic::$ic>
+        impl<I2C, E> Eeprom24x<I2C, page_size::$PS>
         where
-            I2C: Write<Error = E> + WriteRead<Error = E>,
+            I2C: Write<Error = E>
         {
+            $(
+                impl_create!($dev, $part, $create);
+            )*
+
             #[doc = $doc_new]
-            pub fn $create(i2c: I2C, address: SlaveAddr) -> Self {
+            fn new(i2c: I2C, address: SlaveAddr) -> Self {
                 Eeprom24x {
                     i2c,
                     address,
-                    _ic: PhantomData,
+                    _ps: PhantomData,
                 }
             }
 
@@ -318,16 +352,21 @@ macro_rules! impl_device_with_write_page {
         }
     };
 }
-impl_device_with_write_page!("24x01",  AT24C01,  new_24x01,  IC24x01,    8);
-impl_device_with_write_page!("24x02",  AT24C02,  new_24x02,  IC24x02,    8);
-impl_device_with_write_page!("24x04",  AT24C04,  new_24x04,  IC24x04,   16);
-impl_device_with_write_page!("24x08",  AT24C08,  new_24x08,  IC24x08,   16);
-impl_device_with_write_page!("24x16",  AT24C16,  new_24x16,  IC24x16,   16);
-impl_device_with_write_page!("24x32",  AT24C32,  new_24x32,  IC24x32,   32);
-impl_device_with_write_page!("24x64",  AT24C64,  new_24x64,  IC24x64,   32);
-impl_device_with_write_page!("24x128", AT24C128, new_24x128, IC24x128,  64);
-impl_device_with_write_page!("24x256", AT24C256, new_24x256, IC24x256,  64);
-impl_device_with_write_page!("24x512", AT24C512, new_24x512, IC24x512, 128);
+
+impl_for_page_size!(B8, 8,
+    ["24x01",  "AT24C01",  new_24x01],
+    ["24x02",  "AT24C02",  new_24x02]);
+impl_for_page_size!(B16, 16,
+    ["24x04",  "AT24C04",  new_24x04],
+    ["24x08",  "AT24C08",  new_24x08],
+    ["24x16",  "AT24C16",  new_24x16]);
+impl_for_page_size!(B32, 32,
+    ["24x32",  "AT24C32",  new_24x32],
+    ["24x64",  "AT24C64",  new_24x64]);
+impl_for_page_size!(B64, 64,
+    ["24x128", "AT24C128", new_24x128],
+    ["24x256", "AT24C256", new_24x256]);
+impl_for_page_size!(B128, 128, ["24x512", "AT24C512", new_24x512]);
 
 #[cfg(test)]
 mod tests {
