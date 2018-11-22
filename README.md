@@ -18,7 +18,7 @@ This driver allows you to:
 - Write a byte to a memory address. See: `write_byte`
 - Write a byte array (up to a memory page) to a memory address. See: `write_page`
 
-Can be used at least with the devices AT24C32, AT24C64, AT24C128, AT24C256 and AT24C512.
+Can be used at least with the devices listed below.
 
 [Introductory blog post](https://blog.eldruin.com/24x-serial-eeprom-driver-in-rust/)
 
