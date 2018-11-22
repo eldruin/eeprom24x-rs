@@ -184,19 +184,19 @@ impl SlaveAddr {
 /// Page size markers
 pub mod page_size {
     /// No page write supported. e.g. for AT24x00
-    pub struct No;
+    pub struct No(());
     /// 8-byte pages. e.g. for AT24x01, AT24x02
-    pub struct B8;
+    pub struct B8(());
     /// 16-byte pages. e.g. for AT24x04, AT24x08, AT24x16
-    pub struct B16;
+    pub struct B16(());
     /// 32-byte pages. e.g. for AT24x32, AT24x64
-    pub struct B32;
+    pub struct B32(());
     /// 64-byte pages. e.g. for AT24x128, AT24x256
-    pub struct B64;
+    pub struct B64(());
     /// 128-byte pages. e.g. for AT24x512
-    pub struct B128;
+    pub struct B128(());
     /// 256-byte pages. e.g. for AT24xM01, AT24xM02
-    pub struct B256;
+    pub struct B256(());
 }
 
 /// EEPROM24X driver
