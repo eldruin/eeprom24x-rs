@@ -28,6 +28,8 @@ create!(new_24x64,  B32);
 create!(new_24x128, B64);
 create!(new_24x256, B64);
 create!(new_24x512, B128);
+create!(new_24xm01, B256);
+create!(new_24xm02, B256);
 
 
 macro_rules! for_all_ics {
@@ -45,6 +47,8 @@ macro_rules! for_all_ics {
             $name!(for_24x128, new_24x128);
             $name!(for_24x256, new_24x256);
             $name!(for_24x512, new_24x512);
+            $name!(for_24xm01, new_24xm01);
+            $name!(for_24xm02, new_24xm02);
         }
     };
 }
@@ -63,6 +67,8 @@ macro_rules! for_all_ics_with_page_size {
             $name!(for_24x128, new_24x128,  64);
             $name!(for_24x256, new_24x256,  64);
             $name!(for_24x512, new_24x512, 128);
+            $name!(for_24xm01, new_24xm01, 256);
+            $name!(for_24xm02, new_24xm02, 256);
         }
     };
 }

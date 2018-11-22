@@ -42,6 +42,8 @@ applications where low power and low voltage operation are essential.
 | 24x128 |    128 Kbit |      16,384 |  64 bytes | [AT24C128] |
 | 24x256 |    256 Kbit |      32,768 |  64 bytes | [AT24C256] |
 | 24x512 |    512 Kbit |      65,536 | 128 bytes | [AT24C512] |
+| 24xM01 |      1 Mbit |     131,072 | 256 bytes | [AT24CM01] |
+| 24xM02 |      2 Mbit |     262,144 | 256 bytes | [AT24CM02] |
 
 [24C00]: http://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
 [AT24C01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
@@ -54,6 +56,8 @@ applications where low power and low voltage operation are essential.
 [AT24C128]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
 [AT24C256]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
 [AT24C512]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
+[AT24CM01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8812-SEEPROM-AT24CM01-Datasheet.pdf
+[AT24CM02]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8828-SEEPROM-AT24CM02-Datasheet.pdf
 
 ## Usage
 
