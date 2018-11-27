@@ -63,7 +63,7 @@ applications where low power and low voltage operation are essential.
 
 To use this driver, import this crate and an `embedded_hal` implementation,
 then instantiate the appropriate device.
-In the following examples an instance of the device AT24C32 will be created
+In the following examples an instance of the device AT24C256 will be created
 as an example. Other devices can be created with similar methods like:
 ``Eeprom24x::new_24x64(...)``.
 
