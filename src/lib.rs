@@ -241,7 +241,7 @@ pub struct Eeprom24x<I2C, PS, AS> {
     i2c: I2C,
     /// The I²C device address.
     address: SlaveAddr,
-    /// Bits of the device address that are part of the memory address
+    /// Bits of the device address that are part of the memory address.
     devmask: u8,
     /// Page size marker type.
     _ps: PhantomData<PS>,
@@ -261,14 +261,14 @@ impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::One>
 {
     fn invalid_address(&self, address: u32) -> bool {
-        address & !((u32::from(self.devmask) << 8) | 0xff) > 0
+        ((address >> 8) & !u32::from(self.devmask)) > 0
     }
 }
 
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::Two>
 {
     fn invalid_address(&self, address: u32) -> bool {
-        address & !((u32::from(self.devmask) << 16) | 0xffff) > 0
+        ((address >> 16) & !u32::from(self.devmask)) > 0
     }
 }
 
