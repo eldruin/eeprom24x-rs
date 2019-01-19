@@ -209,7 +209,7 @@ pub mod addr_size {
     /// 1-byte memory address.
     /// e.g. for AT24x00, AT24x01, AT24x02, AT24x04, AT24x08, AT24x16
     pub struct One(());
-    /// 2-bytes memory address.
+    /// 2-byte memory address.
     /// e.g. for AT24x32, AT24x64, AT24x128, AT24x256, AT24x512, AT24xM01, AT24xM02
     pub struct Two(());
 }
@@ -271,7 +271,7 @@ impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::Two>
     }
 }
 
-/// Common methods for 1-byte memory addrs
+/// Common methods for 1-byte memory address
 impl<I2C, E, PS> Eeprom24x<I2C, PS, addr_size::One>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
@@ -323,8 +323,8 @@ where
     }
 }
 
-/// Common methods for 2-bytes memory addrs
-impl<I2C, E, PS> Eeprom24x<I2C, PS, addr_size::Two >
+/// Common methods for 2-byte memory address
+impl<I2C, E, PS> Eeprom24x<I2C, PS, addr_size::Two>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
