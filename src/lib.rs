@@ -198,8 +198,9 @@ impl SlaveAddr {
         }
     }
 
-    fn devaddr(self, address: u32, devmask: u8, shift: u8) -> u8 {
-        let hi = ((address >> shift) as u8) & devmask;
+    /// Get the device address possibly including some bits from the memory address
+    fn devaddr(self, memory_address: u32, devmask: u8, shift: u8) -> u8 {
+        let hi = ((memory_address >> shift) as u8) & devmask;
         (self.addr() & !(devmask as u8)) | hi
     }
 }
