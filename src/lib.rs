@@ -263,12 +263,21 @@ impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::One>
     fn is_address_invalid(&self, address: u32) -> bool {
         ((address >> 8) & !u32::from(self.devmask)) > 0
     }
+
+    fn fill_address(&self, address: u32, payload: &mut [u8]) {
+        payload[0] = address as u8;
+    }
 }
 
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::Two>
 {
     fn is_address_invalid(&self, address: u32) -> bool {
         ((address >> 16) & !u32::from(self.devmask)) > 0
+    }
+
+    fn fill_address(&self, address: u32, payload: &mut [u8]) {
+        payload[0] = (address >> 8) as u8;
+        payload[1] = address as u8;
     }
 }
 
@@ -289,7 +298,8 @@ where
         }
 
         let devaddr = self.address.devaddr(address, self.devmask, 8);
-        let payload = [(address & 0xff) as u8, data];
+        let mut payload = [0, data];
+        self.fill_address(address, &mut payload);
         self.i2c
             .write(devaddr, &payload)
             .map_err(Error::I2C)
@@ -302,7 +312,8 @@ where
         }
 
         let devaddr = self.address.devaddr(address, self.devmask, 8);
-        let memaddr = [(address & 0xff) as u8];
+        let mut memaddr = [0];
+        self.fill_address(address, &mut memaddr);
         let mut data = [0; 1];
         self.i2c
             .write_read(devaddr, &memaddr, &mut data)
@@ -317,7 +328,8 @@ where
         }
 
         let devaddr = self.address.devaddr(address, self.devmask, 8);
-        let memaddr = [(address & 0xff) as u8];
+        let mut memaddr = [0];
+        self.fill_address(address, &mut memaddr);
         self.i2c
             .write_read(devaddr, &memaddr, data)
             .map_err(Error::I2C)
@@ -341,7 +353,8 @@ where
         }
 
         let devaddr = self.address.devaddr(address, self.devmask, 16);
-        let payload = [((address >> 8) & 0xff) as u8 , (address & 0xff) as u8, data];
+        let mut payload = [0, 0, data];
+        self.fill_address(address, &mut payload);
         self.i2c
             .write(devaddr, &payload)
             .map_err(Error::I2C)
@@ -354,7 +367,8 @@ where
         }
 
         let devaddr = self.address.devaddr(address, self.devmask, 16);
-        let memaddr = [((address >> 8) & 0xff) as u8 , (address & 0xff) as u8];
+        let mut memaddr = [0; 2];
+        self.fill_address(address, &mut memaddr);
         let mut data = [0; 1];
         self.i2c
             .write_read(devaddr, &memaddr, &mut data)
@@ -369,7 +383,8 @@ where
         }
 
         let devaddr = self.address.devaddr(address, self.devmask, 16);
-        let memaddr = [((address >> 8) & 0xff) as u8 , (address & 0xff) as u8];
+        let mut memaddr = [0; 2];
+        self.fill_address(address, &mut memaddr);
         self.i2c
             .write_read(devaddr, &memaddr, data)
             .map_err(Error::I2C)
@@ -489,7 +504,7 @@ macro_rules! impl_for_page_size {
 
                 let devaddr = self.address.devaddr(address, self.devmask, 8);
                 let mut payload: [u8; 1 + $page_size] = [0; 1 + $page_size];
-                payload[0] = (address & 0xff) as u8;
+                self.fill_address(address, &mut payload);
                 payload[1..= data.len()].copy_from_slice(&data);
                 self.i2c
                     .write(devaddr, &payload[..= data.len()])
@@ -528,8 +543,7 @@ macro_rules! impl_for_page_size {
 
                 let devaddr = self.address.devaddr(address, self.devmask, 16);
                 let mut payload: [u8; 2 + $page_size] = [0; 2 + $page_size];
-                payload[0] = ((address >> 8) & 0xff) as u8;
-                payload[1] = (address & 0xff) as u8;
+                self.fill_address(address, &mut payload);
                 payload[2..=(1 + data.len())].copy_from_slice(&data);
                 self.i2c
                     .write(devaddr, &payload[..=(1 + data.len())])
