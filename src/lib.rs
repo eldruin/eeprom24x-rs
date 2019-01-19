@@ -258,41 +258,51 @@ impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
     }
 }
 
-impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::One>
-{
-    fn is_address_invalid(&self, address: u32) -> bool {
-        ((address >> 8) & !u32::from(self.devmask)) > 0
+mod private {
+    use addr_size;
+
+    pub trait Sealed {}
+
+    pub trait MultiSizeAddr : Sealed {
+        fn is_address_invalid(address: u32, devmask: u8) -> bool;
+        fn fill_address(address: u32, payload: &mut [u8]);
+        const ADDRESS_BYTES: usize;
     }
 
-    fn get_device_address(&self, address: u32) -> u8 {
-        self.address.devaddr(address, self.devmask, 8)
+    impl Sealed for addr_size::One {}
+    impl Sealed for addr_size::Two {}
+}
+
+impl private::MultiSizeAddr for addr_size::One {
+    const ADDRESS_BYTES: usize = 1;
+
+    fn is_address_invalid(address: u32, devmask: u8) -> bool {
+        ((address >> 8) & !u32::from(devmask)) > 0
     }
 
-    fn fill_address(&self, address: u32, payload: &mut [u8]) {
+    fn fill_address(address: u32, payload: &mut [u8]) {
         payload[0] = address as u8;
     }
 }
 
-impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::Two>
-{
-    fn is_address_invalid(&self, address: u32) -> bool {
-        ((address >> 16) & !u32::from(self.devmask)) > 0
+impl private::MultiSizeAddr for addr_size::Two {
+    const ADDRESS_BYTES: usize = 2;
+
+    fn is_address_invalid(address: u32, devmask: u8) -> bool {
+        ((address >> 16) & !u32::from(devmask)) > 0
     }
 
-    fn get_device_address(&self, address: u32) -> u8 {
-        self.address.devaddr(address, self.devmask, 16)
-    }
-
-    fn fill_address(&self, address: u32, payload: &mut [u8]) {
+    fn fill_address(address: u32, payload: &mut [u8]) {
         payload[0] = (address >> 8) as u8;
         payload[1] = address as u8;
     }
 }
 
 /// Common methods for 1-byte memory address
-impl<I2C, E, PS> Eeprom24x<I2C, PS, addr_size::One>
+impl<I2C, E, PS, AS> Eeprom24x<I2C, PS, AS>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
+    AS: private::MultiSizeAddr,
 {
     /// Write a single byte in an address.
     ///
@@ -301,100 +311,46 @@ where
     /// During this time all inputs are disabled and the EEPROM will not
     /// respond until the write is complete.
     pub fn write_byte(&mut self, address: u32, data: u8) -> Result<(), Error<E>> {
-        if self.is_address_invalid(address) {
+        if AS::is_address_invalid(address, self.devmask) {
             return Err(Error::InvalidAddr);
         }
 
-        let devaddr = self.get_device_address(address);
-        let mut payload = [0, data];
-        self.fill_address(address, &mut payload);
+        let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+        let mut payload = [0; 3];
+        AS::fill_address(address, &mut payload);
+        payload[AS::ADDRESS_BYTES] = data;
         self.i2c
-            .write(devaddr, &payload)
+            .write(devaddr, &payload[..=AS::ADDRESS_BYTES])
             .map_err(Error::I2C)
     }
 
     /// Read a single byte from an address.
     pub fn read_byte(&mut self, address: u32) -> Result<u8, Error<E>> {
-        if self.is_address_invalid(address) {
+        if AS::is_address_invalid(address, self.devmask) {
             return Err(Error::InvalidAddr);
         }
 
-        let devaddr = self.get_device_address(address);
-        let mut memaddr = [0];
-        self.fill_address(address, &mut memaddr);
+        let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+        let mut memaddr = [0; 2];
+        AS::fill_address(address, &mut memaddr);
         let mut data = [0; 1];
         self.i2c
-            .write_read(devaddr, &memaddr, &mut data)
+            .write_read(devaddr, &memaddr[..AS::ADDRESS_BYTES], &mut data)
             .map_err(Error::I2C)
             .and(Ok(data[0]))
     }
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
     pub fn read_data(&mut self, address: u32, data: &mut [u8]) -> Result<(), Error<E>> {
-        if self.is_address_invalid(address) {
+        if AS::is_address_invalid(address, self.devmask) {
             return Err(Error::InvalidAddr);
         }
 
-        let devaddr = self.get_device_address(address);
-        let mut memaddr = [0];
-        self.fill_address(address, &mut memaddr);
-        self.i2c
-            .write_read(devaddr, &memaddr, data)
-            .map_err(Error::I2C)
-    }
-}
-
-/// Common methods for 2-byte memory address
-impl<I2C, E, PS> Eeprom24x<I2C, PS, addr_size::Two>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-{
-    /// Write a single byte in an address.
-    ///
-    /// After writing a byte, the EEPROM enters an internally-timed write cycle
-    /// to the nonvolatile memory.
-    /// During this time all inputs are disabled and the EEPROM will not
-    /// respond until the write is complete.
-    pub fn write_byte(&mut self, address: u32, data: u8) -> Result<(), Error<E>> {
-        if self.is_address_invalid(address) {
-            return Err(Error::InvalidAddr);
-        }
-
-        let devaddr = self.get_device_address(address);
-        let mut payload = [0, 0, data];
-        self.fill_address(address, &mut payload);
-        self.i2c
-            .write(devaddr, &payload)
-            .map_err(Error::I2C)
-    }
-
-    /// Read a single byte from an address.
-    pub fn read_byte(&mut self, address: u32) -> Result<u8, Error<E>> {
-        if self.is_address_invalid(address) {
-            return Err(Error::InvalidAddr);
-        }
-
-        let devaddr = self.get_device_address(address);
+        let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
         let mut memaddr = [0; 2];
-        self.fill_address(address, &mut memaddr);
-        let mut data = [0; 1];
+        AS::fill_address(address, &mut memaddr);
         self.i2c
-            .write_read(devaddr, &memaddr, &mut data)
-            .map_err(Error::I2C)
-            .and(Ok(data[0]))
-    }
-
-    /// Read starting in an address as many bytes as necessary to fill the data array provided.
-    pub fn read_data(&mut self, address: u32, data: &mut [u8]) -> Result<(), Error<E>> {
-        if self.is_address_invalid(address) {
-            return Err(Error::InvalidAddr);
-        }
-
-        let devaddr = self.get_device_address(address);
-        let mut memaddr = [0; 2];
-        self.fill_address(address, &mut memaddr);
-        self.i2c
-            .write_read(devaddr, &memaddr, data)
+            .write_read(devaddr, &memaddr[..AS::ADDRESS_BYTES], data)
             .map_err(Error::I2C)
     }
 }
@@ -450,16 +406,16 @@ macro_rules! impl_create {
 }
 
 macro_rules! impl_for_page_size {
-    ( $AS:ident, $PS:ident, $page_size:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ) => {
+    ( $AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ) => {
         impl_for_page_size!{
-            @gen [$AS, $PS, $page_size,
+            @gen [$AS, $addr_bytes, $PS, $page_size,
             concat!("Specialization for devices with a page size of ", stringify!($page_size), " bytes."),
             concat!("Create generic instance for devices with a page size of ", stringify!($page_size), " bytes."),
             $( [ $dev, $part, $mask, $create ] ),* ]
         }
     };
 
-    (@gen [$AS:ident, $PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ] ) => {
+    (@gen [$AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ] ) => {
         #[doc = $doc_impl]
         impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::$AS>
         where
@@ -481,9 +437,10 @@ macro_rules! impl_for_page_size {
             }
         }
 
-        impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::One>
+        impl<I2C, E, AS> Eeprom24x<I2C, page_size::$PS, AS>
         where
-            I2C: Write<Error = E>
+            I2C: Write<Error = E>,
+            AS: private::MultiSizeAddr,
         {
             /// Write up to a page starting in an address.
             ///
@@ -496,7 +453,7 @@ macro_rules! impl_for_page_size {
             /// During this time all inputs are disabled and the EEPROM will not
             /// respond until the write is complete.
             pub fn write_page(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>> {
-                if self.is_address_invalid(address) {
+                if AS::is_address_invalid(address, self.devmask) {
                     return Err(Error::InvalidAddr);
                 }
 
@@ -510,51 +467,12 @@ macro_rules! impl_for_page_size {
                     return Err(Error::TooMuchData);
                 }
 
-                let devaddr = self.get_device_address(address);
-                let mut payload: [u8; 1 + $page_size] = [0; 1 + $page_size];
-                self.fill_address(address, &mut payload);
-                payload[1..= data.len()].copy_from_slice(&data);
+                let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+                let mut payload: [u8; $addr_bytes + $page_size] = [0; $addr_bytes + $page_size];
+                AS::fill_address(address, &mut payload);
+                payload[$addr_bytes..$addr_bytes + data.len()].copy_from_slice(&data);
                 self.i2c
-                    .write(devaddr, &payload[..= data.len()])
-                    .map_err(Error::I2C)
-            }
-        }
-
-        impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::Two>
-        where
-            I2C: Write<Error = E>
-        {
-            /// Write up to a page starting in an address.
-            ///
-            /// The maximum amount of data that can be written depends on the page
-            /// size of the device. If too much data is passed, the error
-            /// `Error::TooMuchData` will be returned.
-            ///
-            /// After writing a byte, the EEPROM enters an internally-timed write cycle
-            /// to the nonvolatile memory.
-            /// During this time all inputs are disabled and the EEPROM will not
-            /// respond until the write is complete.
-            pub fn write_page(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>> {
-                if self.is_address_invalid(address) {
-                    return Err(Error::InvalidAddr);
-                }
-
-                if data.len() == 0 {
-                    return Ok(());
-                }
-
-                if data.len() > $page_size {
-                    // This would actually be supported by the EEPROM but
-                    // the data would be overwritten
-                    return Err(Error::TooMuchData);
-                }
-
-                let devaddr = self.get_device_address(address);
-                let mut payload: [u8; 2 + $page_size] = [0; 2 + $page_size];
-                self.fill_address(address, &mut payload);
-                payload[2..=(1 + data.len())].copy_from_slice(&data);
-                self.i2c
-                    .write(devaddr, &payload[..=(1 + data.len())])
+                    .write(devaddr, &payload[..$addr_bytes + data.len()])
                     .map_err(Error::I2C)
             }
         }
@@ -563,14 +481,14 @@ macro_rules! impl_for_page_size {
 }
 
 impl_for_page_size!(
-    One,
+    One, 1,
     B8,
     8,
     ["24x01", "AT24C01", 0b000, new_24x01],
     ["24x02", "AT24C02", 0b000, new_24x02]
 );
 impl_for_page_size!(
-    One,
+    One, 1,
     B16,
     16,
     ["24x04", "AT24C04", 0b001, new_24x04],
@@ -578,27 +496,27 @@ impl_for_page_size!(
     ["24x16", "AT24C16", 0b111, new_24x16]
 );
 impl_for_page_size!(
-    Two,
+    Two, 2,
     B32,
     32,
     ["24x32", "AT24C32", 0b000, new_24x32],
     ["24x64", "AT24C64", 0b000, new_24x64]
 );
 impl_for_page_size!(
-    Two,
+    Two, 2,
     B64,
     64,
     ["24x128", "AT24C128", 0b000, new_24x128],
     ["24x256", "AT24C256", 0b000, new_24x256]
 );
 impl_for_page_size!(
-    Two,
+    Two, 2,
     B128,
     128,
     ["24x512", "AT24C512", 0b000, new_24x512]
 );
 impl_for_page_size!(
-    Two,
+    Two, 2,
     B256,
     256,
     ["24xM01", "AT24CM01", 0b001, new_24xm01],
