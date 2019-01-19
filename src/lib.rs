@@ -206,11 +206,11 @@ impl SlaveAddr {
 
 /// Memory address size markers
 pub mod addr_size {
-    /// AT24x00, AT24x01, AT24x02, AT24x04, AT24x08, AT24x16:
-    /// 1-byte memory address
+    /// 1-byte memory address.
+    /// e.g. for AT24x00, AT24x01, AT24x02, AT24x04, AT24x08, AT24x16
     pub struct One(());
-    /// AT24x32, AT24x64, AT24x128, AT24x256, AT24x512, AT24xM01, AT24xM02:
-    /// 2-bytes memory address
+    /// 2-bytes memory address.
+    /// e.g. for AT24x32, AT24x64, AT24x128, AT24x256, AT24x512, AT24xM01, AT24xM02
     pub struct Two(());
 }
 
@@ -248,7 +248,7 @@ pub struct Eeprom24x<I2C, PS, AS> {
     _as: PhantomData<AS>,
 }
 
-/// Common methods for 1-byte memory addrs
+/// Common methods
 impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
 {
     /// Destroy driver instance, return I²C bus instance.
