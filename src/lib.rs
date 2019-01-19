@@ -160,11 +160,21 @@ pub enum Error<E> {
 }
 
 /// Possible slave addresses
+///
+/// Note that in some devices some of the address bits are used for memory addressing and
+/// will therefore be ignored.
 #[derive(Debug, Clone, Copy)]
 pub enum SlaveAddr {
     /// Default slave address
     Default,
     /// Alternative slave address providing bit values for A2, A1 and A0
+    ///
+    /// Depending on the device, some of the device address bits may be used for memory addresses.
+    /// In this case, the value provided here for these bits will be ignored. Consult the
+    /// device addressing in your device datasheet.
+    ///
+    /// e.g. For the 24xM01 devices use the A0 bit of the device address as the highest memory
+    /// address bit. The value provided here will be ignored.
     Alternative(bool, bool, bool),
 }
 
