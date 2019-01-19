@@ -241,7 +241,7 @@ pub struct Eeprom24x<I2C, PS, AS> {
     i2c: I2C,
     /// The I²C device address.
     address: SlaveAddr,
-    /// Bits of the device address that are part of the memory address.
+    /// Bitmask of the bits in the device address that are used as part of the memory address.
     devmask: u8,
     /// Page size marker type.
     _ps: PhantomData<PS>,
