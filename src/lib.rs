@@ -200,7 +200,7 @@ impl SlaveAddr {
 
     fn devaddr(self, address: u32, devmask: u32, shift: u32) -> u8 {
         let hi: u8 = ((address >> shift) & devmask) as u8;
-        self.addr() | hi
+        (self.addr() & !(devmask as u8)) | hi
     }
 }
 
