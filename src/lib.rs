@@ -260,14 +260,14 @@ impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
 
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::One>
 {
-    fn invalid_address(&self, address: u32) -> bool {
+    fn is_address_invalid(&self, address: u32) -> bool {
         ((address >> 8) & !u32::from(self.devmask)) > 0
     }
 }
 
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::Two>
 {
-    fn invalid_address(&self, address: u32) -> bool {
+    fn is_address_invalid(&self, address: u32) -> bool {
         ((address >> 16) & !u32::from(self.devmask)) > 0
     }
 }
@@ -284,7 +284,7 @@ where
     /// During this time all inputs are disabled and the EEPROM will not
     /// respond until the write is complete.
     pub fn write_byte(&mut self, address: u32, data: u8) -> Result<(), Error<E>> {
-        if self.invalid_address(address) {
+        if self.is_address_invalid(address) {
             return Err(Error::InvalidAddr);
         }
 
@@ -297,7 +297,7 @@ where
 
     /// Read a single byte from an address.
     pub fn read_byte(&mut self, address: u32) -> Result<u8, Error<E>> {
-        if self.invalid_address(address) {
+        if self.is_address_invalid(address) {
             return Err(Error::InvalidAddr);
         }
 
@@ -312,7 +312,7 @@ where
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
     pub fn read_data(&mut self, address: u32, data: &mut [u8]) -> Result<(), Error<E>> {
-        if self.invalid_address(address) {
+        if self.is_address_invalid(address) {
             return Err(Error::InvalidAddr);
         }
 
@@ -336,7 +336,7 @@ where
     /// During this time all inputs are disabled and the EEPROM will not
     /// respond until the write is complete.
     pub fn write_byte(&mut self, address: u32, data: u8) -> Result<(), Error<E>> {
-        if self.invalid_address(address) {
+        if self.is_address_invalid(address) {
             return Err(Error::InvalidAddr);
         }
 
@@ -349,7 +349,7 @@ where
 
     /// Read a single byte from an address.
     pub fn read_byte(&mut self, address: u32) -> Result<u8, Error<E>> {
-        if self.invalid_address(address) {
+        if self.is_address_invalid(address) {
             return Err(Error::InvalidAddr);
         }
 
@@ -364,7 +364,7 @@ where
 
     /// Read starting in an address as many bytes as necessary to fill the data array provided.
     pub fn read_data(&mut self, address: u32, data: &mut [u8]) -> Result<(), Error<E>> {
-        if self.invalid_address(address) {
+        if self.is_address_invalid(address) {
             return Err(Error::InvalidAddr);
         }
 
@@ -473,7 +473,7 @@ macro_rules! impl_for_page_size {
             /// During this time all inputs are disabled and the EEPROM will not
             /// respond until the write is complete.
             pub fn write_page(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>> {
-                if self.invalid_address(address) {
+                if self.is_address_invalid(address) {
                     return Err(Error::InvalidAddr);
                 }
 
@@ -512,7 +512,7 @@ macro_rules! impl_for_page_size {
             /// During this time all inputs are disabled and the EEPROM will not
             /// respond until the write is complete.
             pub fn write_page(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>> {
-                if self.invalid_address(address) {
+                if self.is_address_invalid(address) {
                     return Err(Error::InvalidAddr);
                 }
 
