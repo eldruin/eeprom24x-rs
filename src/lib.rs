@@ -198,8 +198,8 @@ impl SlaveAddr {
         }
     }
 
-    fn devaddr(self, address: u32, devmask: u32, shift: u8) -> u8 {
-        let hi: u8 = ((address >> shift) & devmask) as u8;
+    fn devaddr(self, address: u32, devmask: u8, shift: u8) -> u8 {
+        let hi = ((address >> shift) as u8) & devmask;
         (self.addr() & !(devmask as u8)) | hi
     }
 }
@@ -240,8 +240,8 @@ pub struct Eeprom24x<I2C, PS, AS> {
     i2c: I2C,
     /// The I²C device address.
     address: SlaveAddr,
-    /// FIXME: high mem addr bits: part of dev addr
-    devmask: u32,
+    /// Bits of the device address that are part of the memory address
+    devmask: u8,
     /// Page size marker type.
     _ps: PhantomData<PS>,
     /// Address size marker type.
@@ -260,14 +260,14 @@ impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::One>
 {
     fn invalid_address(&self, address: u32) -> bool {
-        address & !((self.devmask << 8) | 0xff) > 0
+        address & !((u32::from(self.devmask) << 8) | 0xff) > 0
     }
 }
 
 impl<I2C, PS> Eeprom24x<I2C, PS, addr_size::Two>
 {
     fn invalid_address(&self, address: u32) -> bool {
-        address & !((self.devmask << 16) | 0xffff) > 0
+        address & !((u32::from(self.devmask) << 16) | 0xffff) > 0
     }
 }
 
@@ -446,7 +446,7 @@ macro_rules! impl_for_page_size {
             )*
 
             #[doc = $doc_new]
-            fn new(i2c: I2C, address: SlaveAddr, devmask: u32) -> Self {
+            fn new(i2c: I2C, address: SlaveAddr, devmask: u8) -> Self {
                 Eeprom24x {
                     i2c,
                     address,
