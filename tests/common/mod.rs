@@ -6,7 +6,9 @@ pub const DEV_ADDR: u8 = 0b101_0000;
 
 macro_rules! create {
     ($create:ident, $AS:ident, $PS:ident) => {
-        pub fn $create(transactions: &[I2cTrans]) -> Eeprom24x<I2cMock, page_size::$PS, addr_size::$AS> {
+        pub fn $create(
+            transactions: &[I2cTrans],
+        ) -> Eeprom24x<I2cMock, page_size::$PS, addr_size::$AS> {
             Eeprom24x::$create(I2cMock::new(&transactions), SlaveAddr::default())
         }
     };
@@ -57,12 +59,12 @@ macro_rules! for_all_ics_with_1b_addr {
     ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x00,  new_24x00);
-            $name!(for_24x01,  new_24x01);
-            $name!(for_24x02,  new_24x02);
-            $name!(for_24x04,  new_24x04);
-            $name!(for_24x08,  new_24x08);
-            $name!(for_24x16,  new_24x16);
+            $name!(for_24x00, new_24x00);
+            $name!(for_24x01, new_24x01);
+            $name!(for_24x02, new_24x02);
+            $name!(for_24x04, new_24x04);
+            $name!(for_24x08, new_24x08);
+            $name!(for_24x16, new_24x16);
         }
     };
 }
@@ -88,11 +90,11 @@ macro_rules! for_all_ics_with_1b_addr_and_page_size {
     ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x01,  new_24x01,    8);
-            $name!(for_24x02,  new_24x02,    8);
-            $name!(for_24x04,  new_24x04,   16);
-            $name!(for_24x08,  new_24x08,   16);
-            $name!(for_24x16,  new_24x16,   16);
+            $name!(for_24x01, new_24x01, 8);
+            $name!(for_24x02, new_24x02, 8);
+            $name!(for_24x04, new_24x04, 16);
+            $name!(for_24x08, new_24x08, 16);
+            $name!(for_24x16, new_24x16, 16);
         }
     };
 }

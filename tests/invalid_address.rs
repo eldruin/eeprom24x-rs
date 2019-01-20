@@ -3,8 +3,8 @@ use eeprom24x::Error;
 extern crate embedded_hal_mock as hal;
 mod common;
 use common::{
-    destroy, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x16, new_24x32,
-    new_24x64, new_24x128, new_24x256, new_24x512, new_24xm01, new_24xm02,
+    destroy, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x128, new_24x16,
+    new_24x256, new_24x32, new_24x512, new_24x64, new_24xm01, new_24xm02,
 };
 
 // only available since Rust 1.31: #[allow(clippy::needless_pass_by_value)]

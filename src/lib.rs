@@ -251,8 +251,7 @@ pub struct Eeprom24x<I2C, PS, AS> {
 }
 
 /// Common methods
-impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
-{
+impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS> {
     /// Destroy driver instance, return I²C bus instance.
     pub fn destroy(self) -> I2C {
         self.i2c
@@ -267,7 +266,11 @@ where
         if memory_address >= (1 << self.address_bits) {
             return Err(Error::InvalidAddr);
         }
-        let addr = self.address.devaddr(memory_address, self.address_bits, AS::ADDRESS_BYTES as u8 * 8);
+        let addr = self.address.devaddr(
+            memory_address,
+            self.address_bits,
+            AS::ADDRESS_BYTES as u8 * 8,
+        );
         Ok(addr)
     }
 }
@@ -277,7 +280,7 @@ mod private {
 
     pub trait Sealed {}
 
-    pub trait MultiSizeAddr : Sealed {
+    pub trait MultiSizeAddr: Sealed {
         const ADDRESS_BYTES: usize;
 
         fn fill_address(address: u32, payload: &mut [u8]);
@@ -386,7 +389,7 @@ where
 
 macro_rules! impl_create {
     ( $dev:expr, $part:expr, $address_bits:expr, $create:ident ) => {
-        impl_create!{
+        impl_create! {
             @gen [$create, $address_bits,
                 concat!("Create a new instance of a ", $dev, " device (e.g. ", $part, ")")]
         }
@@ -486,14 +489,16 @@ macro_rules! impl_for_page_size {
 }
 
 impl_for_page_size!(
-    One, 1,
+    One,
+    1,
     B8,
     8,
     ["24x01", "AT24C01", 7, new_24x01],
     ["24x02", "AT24C02", 8, new_24x02]
 );
 impl_for_page_size!(
-    One, 1,
+    One,
+    1,
     B16,
     16,
     ["24x04", "AT24C04", 9, new_24x04],
@@ -501,27 +506,25 @@ impl_for_page_size!(
     ["24x16", "AT24C16", 11, new_24x16]
 );
 impl_for_page_size!(
-    Two, 2,
+    Two,
+    2,
     B32,
     32,
     ["24x32", "AT24C32", 12, new_24x32],
     ["24x64", "AT24C64", 13, new_24x64]
 );
 impl_for_page_size!(
-    Two, 2,
+    Two,
+    2,
     B64,
     64,
     ["24x128", "AT24C128", 14, new_24x128],
     ["24x256", "AT24C256", 15, new_24x256]
 );
+impl_for_page_size!(Two, 2, B128, 128, ["24x512", "AT24C512", 16, new_24x512]);
 impl_for_page_size!(
-    Two, 2,
-    B128,
-    128,
-    ["24x512", "AT24C512", 16, new_24x512]
-);
-impl_for_page_size!(
-    Two, 2,
+    Two,
+    2,
     B256,
     256,
     ["24xM01", "AT24CM01", 17, new_24xm01],
