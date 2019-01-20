@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ...
 
+## [0.3.0] - 2019-01-20
+### Changed
+- [breaking-change] The addresses are now passed as a single `u32`.
+User code should be easy to adapt:
+`eeprom.read_byte([0x12, 0x34])` now becomes: `eeprom.read_byte(0x1234)`.
+
+### Fixed
+- High memory addressing in devices using some device address bits for memory
+addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02`.
+- Protect against memory address rollover.
+- Protect against page address rollover.
+
+## [0.2.1] - 2019-01-20
+### Removed
+- [breaking-change] Removed support for devices that use some device address
+bits for memory addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02` as
+the addressing was erroneous. Please upgrade to version `0.3.0` to use them.
+
 ## [0.2.0] - 2018-11-22
 ### Added
 - Add support for many more devices.
@@ -32,6 +50,8 @@ This is the initial release to crates.io of the feature-complete driver. There
 may be some API changes in the future, in case I decide that something can be
 further improved. All changes will be documented in this CHANGELOG.
 
-[Unreleased]: https://github.com/eldruin/eeprom24x-rs/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/eldruin/eeprom24x-rs/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/eldruin/eeprom24x-rs/compare/v0.2.0...v0.3.0
+[0.2.1]: https://github.com/eldruin/eeprom24x-rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/eldruin/eeprom24x-rs/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/eldruin/eeprom24x-rs/compare/v0.1.0...v0.1.1
