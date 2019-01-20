@@ -18,19 +18,19 @@ pub fn destroy<T, V>(eeprom: Eeprom24x<I2cMock, T, V>) {
     eeprom.destroy().done();
 }
 
-create!(new_24x00, One, No);
-create!(new_24x01, One, B8);
-create!(new_24x02, One, B8);
-create!(new_24x04, One, B16);
-create!(new_24x08, One, B16);
-create!(new_24x16, One, B16);
-create!(new_24x32, Two, B32);
-create!(new_24x64, Two, B32);
-create!(new_24x128, Two, B64);
-create!(new_24x256, Two, B64);
-create!(new_24x512, Two, B128);
-create!(new_24xm01, Two, B256);
-create!(new_24xm02, Two, B256);
+create!(new_24x00, OneByte, No);
+create!(new_24x01, OneByte, B8);
+create!(new_24x02, OneByte, B8);
+create!(new_24x04, OneByte, B16);
+create!(new_24x08, OneByte, B16);
+create!(new_24x16, OneByte, B16);
+create!(new_24x32, TwoBytes, B32);
+create!(new_24x64, TwoBytes, B32);
+create!(new_24x128, TwoBytes, B64);
+create!(new_24x256, TwoBytes, B64);
+create!(new_24x512, TwoBytes, B128);
+create!(new_24xm01, TwoBytes, B256);
+create!(new_24xm02, TwoBytes, B256);
 
 #[macro_export]
 macro_rules! for_all_ics {
