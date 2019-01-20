@@ -198,7 +198,7 @@ macro_rules! cannot_write_so_much_data_that_page_address_would_rollover {
         #[test]
         fn $name() {
             let mut eeprom = $create(&[]);
-            assert_too_much_data(eeprom.write_page(0x00, &[0xAB; 1 + $size]));
+            assert_too_much_data(eeprom.write_page(0x01, &[0xAB; $size]));
             destroy(eeprom);
         }
     };
