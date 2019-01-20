@@ -19,7 +19,7 @@ macro_rules! construction_test {
 }
 for_all_ics!(construction_test);
 
-macro_rules! can_read_byte_v1 {
+macro_rules! can_read_byte_1byte_addr {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -31,9 +31,9 @@ macro_rules! can_read_byte_v1 {
         }
     };
 }
-for_all_ics_with_1b_addr!(can_read_byte_v1);
+for_all_ics_with_1b_addr!(can_read_byte_1byte_addr);
 
-macro_rules! can_read_byte_v2 {
+macro_rules! can_read_byte_2byte_addr {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -45,9 +45,9 @@ macro_rules! can_read_byte_v2 {
         }
     };
 }
-for_all_ics_with_2b_addr!(can_read_byte_v2);
+for_all_ics_with_2b_addr!(can_read_byte_2byte_addr);
 
-macro_rules! can_read_array_v1 {
+macro_rules! can_read_array_1byte_addr {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -60,9 +60,9 @@ macro_rules! can_read_array_v1 {
         }
     };
 }
-for_all_ics_with_1b_addr!(can_read_array_v1);
+for_all_ics_with_1b_addr!(can_read_array_1byte_addr);
 
-macro_rules! can_read_array_v2 {
+macro_rules! can_read_array_2byte_addr {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -75,7 +75,7 @@ macro_rules! can_read_array_v2 {
         }
     };
 }
-for_all_ics_with_2b_addr!(can_read_array_v2);
+for_all_ics_with_2b_addr!(can_read_array_2byte_addr);
 
 macro_rules! can_read_current_address {
     ($name:ident, $create:ident) => {
@@ -91,7 +91,7 @@ macro_rules! can_read_current_address {
 }
 for_all_ics!(can_read_current_address);
 
-macro_rules! can_write_byte_v1{
+macro_rules! can_write_byte_1byte_addr{
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -102,9 +102,9 @@ macro_rules! can_write_byte_v1{
         }
     };
 }
-for_all_ics_with_1b_addr!(can_write_byte_v1);
+for_all_ics_with_1b_addr!(can_write_byte_1byte_addr);
 
-macro_rules! can_write_byte_v2{
+macro_rules! can_write_byte_2byte_addr{
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -115,7 +115,7 @@ macro_rules! can_write_byte_v2{
         }
     };
 }
-for_all_ics_with_2b_addr!(can_write_byte_v2);
+for_all_ics_with_2b_addr!(can_write_byte_2byte_addr);
 
 macro_rules! write_empty_data_does_nothing {
     ($name:ident, $create:ident, $page_size:expr) => {
@@ -129,7 +129,7 @@ macro_rules! write_empty_data_does_nothing {
 }
 for_all_ics_with_page_size!(write_empty_data_does_nothing);
 
-macro_rules! can_write_array_v1 {
+macro_rules! can_write_array_1byte_addr {
     ($name:ident, $create:ident, $page_size:expr) => {
         #[test]
         fn $name() {
@@ -140,9 +140,9 @@ macro_rules! can_write_array_v1 {
         }
     };
 }
-for_all_ics_with_1b_addr_and_page_size!(can_write_array_v1);
+for_all_ics_with_1b_addr_and_page_size!(can_write_array_1byte_addr);
 
-macro_rules! can_write_array_v2 {
+macro_rules! can_write_array_2byte_addr {
     ($name:ident, $create:ident, $page_size:expr) => {
         #[test]
         fn $name() {
@@ -153,7 +153,7 @@ macro_rules! can_write_array_v2 {
         }
     };
 }
-for_all_ics_with_2b_addr_and_page_size!(can_write_array_v2);
+for_all_ics_with_2b_addr_and_page_size!(can_write_array_2byte_addr);
 
 // only available since Rust 1.31: #[allow(clippy::needless_pass_by_value)]
 fn assert_too_much_data<T, E>(result: Result<T, Error<E>>) {
@@ -198,7 +198,7 @@ macro_rules! cannot_write_so_much_data_that_page_address_would_rollover {
 for_all_ics_with_page_size!(cannot_write_so_much_data_that_page_address_would_rollover);
 
 
-macro_rules! can_write_whole_page_v1 {
+macro_rules! can_write_whole_page_1byte_addr {
     ($name:ident, $create:ident, $size:expr) => {
         #[test]
         fn $name() {
@@ -211,9 +211,9 @@ macro_rules! can_write_whole_page_v1 {
         }
     };
 }
-for_all_ics_with_1b_addr_and_page_size!(can_write_whole_page_v1);
+for_all_ics_with_1b_addr_and_page_size!(can_write_whole_page_1byte_addr);
 
-macro_rules! can_write_whole_page_v2 {
+macro_rules! can_write_whole_page_2byte_addr {
     ($name:ident, $create:ident, $size:expr) => {
         #[test]
         fn $name() {
@@ -226,7 +226,7 @@ macro_rules! can_write_whole_page_v2 {
         }
     };
 }
-for_all_ics_with_2b_addr_and_page_size!(can_write_whole_page_v2);
+for_all_ics_with_2b_addr_and_page_size!(can_write_whole_page_2byte_addr);
 
 #[test]
 fn can_use_device_address_for_memory_addressing_1byte() {

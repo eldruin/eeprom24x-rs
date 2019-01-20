@@ -25,7 +25,7 @@ fn check_addr_assert_fails() {
     assert_invalid_address::<(), ()>(Ok(()));
 }
 
-macro_rules! cannot_write_invalid_addr_v1 {
+macro_rules! cannot_write_invalid_addr_1byte_addr {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -35,9 +35,9 @@ macro_rules! cannot_write_invalid_addr_v1 {
         }
     };
 }
-for_all_ics_with_1b_addr!(cannot_write_invalid_addr_v1);
+for_all_ics_with_1b_addr!(cannot_write_invalid_addr_1byte_addr);
 
-macro_rules! cannot_write_invalid_addr_v2 {
+macro_rules! cannot_write_invalid_addr_2byte_addr {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
@@ -47,7 +47,7 @@ macro_rules! cannot_write_invalid_addr_v2 {
         }
     };
 }
-for_all_ics_with_2b_addr!(cannot_write_invalid_addr_v2);
+for_all_ics_with_2b_addr!(cannot_write_invalid_addr_2byte_addr);
 
 #[test]
 fn cannot_write_to_position_over_capacity_1byte() {
