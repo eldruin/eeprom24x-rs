@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ...
 
+## [0.3.0] - 2019-01-20
+### Changed
+- [breaking-change] The addresses are now passed as a single `u32`.
+User code should be easy to adapt:
+`eeprom.read_byte([0x12, 0x34])` now becomes: `eeprom.read_byte(0x1234)`.
+
+### Fixed
+- High memory addressing in devices using some device address bits for memory
+addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02`.
+- Protect against memory address rollover.
+- Protect against page address rollover.
+
+## [0.2.1] - 2019-01-20
+### Removed
+- Removed support for devices that use some device address bits for memory
+addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02` as the addressing was
+erroneous. Please upgrade to version `0.3.0` to use them.
+
 ## [0.2.0] - 2018-11-22
 ### Added
 - Add support for many more devices.
