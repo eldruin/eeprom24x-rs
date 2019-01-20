@@ -20,16 +20,11 @@ fn destroy<T>(eeprom: Eeprom24x<I2cMock, T>) {
 create!(new_24x00,  No);
 create!(new_24x01,  B8);
 create!(new_24x02,  B8);
-create!(new_24x04,  B16);
-create!(new_24x08,  B16);
-create!(new_24x16,  B16);
 create!(new_24x32,  B32);
 create!(new_24x64,  B32);
 create!(new_24x128, B64);
 create!(new_24x256, B64);
 create!(new_24x512, B128);
-create!(new_24xm01, B256);
-create!(new_24xm02, B256);
 
 
 macro_rules! for_all_ics {
@@ -39,16 +34,11 @@ macro_rules! for_all_ics {
             $name!(for_24x00,  new_24x00);
             $name!(for_24x01,  new_24x01);
             $name!(for_24x02,  new_24x02);
-            $name!(for_24x04,  new_24x04);
-            $name!(for_24x08,  new_24x08);
-            $name!(for_24x16,  new_24x16);
             $name!(for_24x32,  new_24x32);
             $name!(for_24x64,  new_24x64);
             $name!(for_24x128, new_24x128);
             $name!(for_24x256, new_24x256);
             $name!(for_24x512, new_24x512);
-            $name!(for_24xm01, new_24xm01);
-            $name!(for_24xm02, new_24xm02);
         }
     };
 }
@@ -59,16 +49,11 @@ macro_rules! for_all_ics_with_page_size {
             use super::*;
             $name!(for_24x01,  new_24x01,    8);
             $name!(for_24x02,  new_24x02,    8);
-            $name!(for_24x04,  new_24x04,   16);
-            $name!(for_24x08,  new_24x08,   16);
-            $name!(for_24x16,  new_24x16,   16);
             $name!(for_24x32,  new_24x32,   32);
             $name!(for_24x64,  new_24x64,   32);
             $name!(for_24x128, new_24x128,  64);
             $name!(for_24x256, new_24x256,  64);
             $name!(for_24x512, new_24x512, 128);
-            $name!(for_24xm01, new_24xm01, 256);
-            $name!(for_24xm02, new_24xm02, 256);
         }
     };
 }
