@@ -406,6 +406,7 @@ macro_rules! impl_create {
     };
 }
 
+// This macro could be simplified once https://github.com/rust-lang/rust/issues/42863 is fixed.
 macro_rules! impl_for_page_size {
     ( $AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ) => {
         impl_for_page_size!{
