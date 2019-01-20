@@ -307,7 +307,7 @@ impl private::MultiSizeAddr for addr_size::Two {
     }
 }
 
-/// Common methods for 1-byte memory address
+/// Common methods
 impl<I2C, E, PS, AS> Eeprom24x<I2C, PS, AS>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
@@ -446,8 +446,8 @@ macro_rules! impl_for_page_size {
             /// Write up to a page starting in an address.
             ///
             /// The maximum amount of data that can be written depends on the page
-            /// size of the device. If too much data is passed, the error
-            /// `Error::TooMuchData` will be returned.
+            /// size of the device and its overall capacity. If too much data is passed,
+            /// the error `Error::TooMuchData` will be returned.
             ///
             /// After writing a byte, the EEPROM enters an internally-timed write cycle
             /// to the nonvolatile memory.
