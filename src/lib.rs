@@ -473,7 +473,9 @@ macro_rules! impl_for_page_size {
                 let devaddr = self.get_device_address(address)?;
                 let mut payload: [u8; $addr_bytes + $page_size] = [0; $addr_bytes + $page_size];
                 AS::fill_address(address, &mut payload);
+                // only available since Rust 1.31: #[allow(clippy::range_plus_one)]
                 payload[$addr_bytes..$addr_bytes + data.len()].copy_from_slice(&data);
+                // only available since Rust 1.31: #[allow(clippy::range_plus_one)]
                 self.i2c
                     .write(devaddr, &payload[..$addr_bytes + data.len()])
                     .map_err(Error::I2C)

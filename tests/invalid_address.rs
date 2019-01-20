@@ -7,7 +7,7 @@ use common::{
     new_24x64, new_24x128, new_24x256, new_24x512, new_24xm01, new_24xm02,
 };
 
-
+// only available since Rust 1.31: #[allow(clippy::needless_pass_by_value)]
 fn assert_invalid_address<T, E>(result: Result<T, Error<E>>) {
     match result {
         Err(Error::InvalidAddr) => (),

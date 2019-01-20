@@ -155,6 +155,7 @@ macro_rules! can_write_array_v2 {
 }
 for_all_ics_with_2b_addr_and_page_size!(can_write_array_v2);
 
+// only available since Rust 1.31: #[allow(clippy::needless_pass_by_value)]
 fn assert_too_much_data<T, E>(result: Result<T, Error<E>>) {
     match result {
         Err(Error::TooMuchData) => (),
