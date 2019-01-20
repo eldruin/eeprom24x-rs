@@ -455,9 +455,18 @@ macro_rules! impl_for_page_size {
                     return Ok(());
                 }
 
+                // check this before to ensure that data.len() fits into u32
+                // ($page_size always fits as its maximum value es 256).
                 if data.len() > $page_size {
                     // This would actually be supported by the EEPROM but
-                    // the data would be overwritten
+                    // the data in the page would be overwritten
+                    return Err(Error::TooMuchData);
+                }
+
+                let page_boundary = address | ($page_size as u32 - 1);
+                if address + data.len() as u32 > page_boundary + 1 {
+                    // This would actually be supported by the EEPROM but
+                    // the data in the page would be overwritten
                     return Err(Error::TooMuchData);
                 }
 

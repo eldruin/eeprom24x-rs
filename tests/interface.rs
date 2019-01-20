@@ -184,15 +184,28 @@ macro_rules! cannot_write_too_big_page {
 }
 for_all_ics_with_page_size!(cannot_write_too_big_page);
 
+macro_rules! cannot_write_so_much_data_that_page_address_would_rollover {
+    ($name:ident, $create:ident, $size:expr) => {
+        #[test]
+        fn $name() {
+            let mut eeprom = $create(&[]);
+            assert_too_much_data(eeprom.write_page(0x00, &[0xAB; 1 + $size]));
+            destroy(eeprom);
+        }
+    };
+}
+for_all_ics_with_page_size!(cannot_write_so_much_data_that_page_address_would_rollover);
+
+
 macro_rules! can_write_whole_page_v1 {
     ($name:ident, $create:ident, $size:expr) => {
         #[test]
         fn $name() {
-            let mut data = vec![0x34];
+            let mut data = vec![$size];
             data.extend_from_slice(&[0xAB; $size]);
             let trans = [I2cTrans::write(DEV_ADDR, data)];
             let mut eeprom = $create(&trans);
-            eeprom.write_page(0x34, &[0xAB; $size]).unwrap();
+            eeprom.write_page($size, &[0xAB; $size]).unwrap();
             destroy(eeprom);
         }
     };
@@ -203,11 +216,11 @@ macro_rules! can_write_whole_page_v2 {
     ($name:ident, $create:ident, $size:expr) => {
         #[test]
         fn $name() {
-            let mut data = vec![0xF, 0x34];
+            let mut data = vec![($size >> 8) as u8, $size as u8];
             data.extend_from_slice(&[0xAB; $size]);
             let trans = [I2cTrans::write(DEV_ADDR, data)];
             let mut eeprom = $create(&trans);
-            eeprom.write_page(0xF34, &[0xAB; $size]).unwrap();
+            eeprom.write_page($size as u32, &[0xAB; $size]).unwrap();
             destroy(eeprom);
         }
     };

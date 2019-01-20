@@ -31,7 +31,7 @@ create!(new_24xm01, Two, B256);
 create!(new_24xm02, Two, B256);
 
 #[macro_export]
-macro_rules! for_all_ics{
+macro_rules! for_all_ics {
     ($name:ident) => {
         mod $name {
             use super::*;
@@ -107,8 +107,8 @@ macro_rules! for_all_ics_with_2b_addr_and_page_size {
             $name!(for_24x128, new_24x128,  64);
             $name!(for_24x256, new_24x256,  64);
             $name!(for_24x512, new_24x512, 128);
-            $name!(for_24xm01, new_24xm01, 256);
-            $name!(for_24xm02, new_24xm02, 256);
+            $name!(for_24xm01, new_24xm01, 256_usize);
+            $name!(for_24xm02, new_24xm02, 256_usize);
         }
     };
 }
