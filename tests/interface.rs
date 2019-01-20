@@ -144,9 +144,9 @@ macro_rules! can_read_byte_v1 {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
-            let trans = [I2cTrans::write_read(DEV_ADDR, vec![0x34], vec![0xAB])];
+            let trans = [I2cTrans::write_read(DEV_ADDR, vec![0xF], vec![0xAB])];
             let mut eeprom = $create(&trans);
-            let data = eeprom.read_byte(0x34).unwrap();
+            let data = eeprom.read_byte(0xF).unwrap();
             assert_eq!(0xAB, data);
             destroy(eeprom);
         }
@@ -158,9 +158,9 @@ macro_rules! can_read_byte_v2 {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
-            let trans = [I2cTrans::write_read(DEV_ADDR, vec![0x12, 0x34], vec![0xAB])];
+            let trans = [I2cTrans::write_read(DEV_ADDR, vec![0xF, 0x34], vec![0xAB])];
             let mut eeprom = $create(&trans);
-            let data = eeprom.read_byte(0x1234).unwrap();
+            let data = eeprom.read_byte(0xF34).unwrap();
             assert_eq!(0xAB, data);
             destroy(eeprom);
         }
@@ -172,10 +172,10 @@ macro_rules! can_read_array_v1 {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
-            let trans = [ I2cTrans::write_read(DEV_ADDR, vec![0x34], vec![0xAB, 0xCD, 0xEF]) ];
+            let trans = [ I2cTrans::write_read(DEV_ADDR, vec![0xF], vec![0xAB, 0xCD, 0xEF]) ];
             let mut eeprom = $create(&trans);
             let mut data = [0; 3];
-            eeprom.read_data(0x34, &mut data).unwrap();
+            eeprom.read_data(0xF, &mut data).unwrap();
             assert_eq!([0xAB, 0xCD, 0xEF], data);
             destroy(eeprom);
         }
@@ -187,10 +187,10 @@ macro_rules! can_read_array_v2 {
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
-            let trans = [ I2cTrans::write_read(DEV_ADDR, vec![0x12, 0x34], vec![0xAB, 0xCD, 0xEF]) ];
+            let trans = [ I2cTrans::write_read(DEV_ADDR, vec![0xF, 0x34], vec![0xAB, 0xCD, 0xEF]) ];
             let mut eeprom = $create(&trans);
             let mut data = [0; 3];
-            eeprom.read_data(0x1234, &mut data).unwrap();
+            eeprom.read_data(0xF34, &mut data).unwrap();
             assert_eq!([0xAB, 0xCD, 0xEF], data);
             destroy(eeprom);
         }
@@ -216,9 +216,9 @@ macro_rules! can_write_byte_v1{
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
-            let trans = [I2cTrans::write(DEV_ADDR, vec![0x34, 0xAB])];
+            let trans = [I2cTrans::write(DEV_ADDR, vec![0xF, 0xAB])];
             let mut eeprom = $create(&trans);
-            eeprom.write_byte(0x34, 0xAB).unwrap();
+            eeprom.write_byte(0xF, 0xAB).unwrap();
             destroy(eeprom);
         }
     };
@@ -229,9 +229,9 @@ macro_rules! can_write_byte_v2{
     ($name:ident, $create:ident) => {
         #[test]
         fn $name() {
-            let trans = [I2cTrans::write(DEV_ADDR, vec![0x12, 0x34, 0xAB])];
+            let trans = [I2cTrans::write(DEV_ADDR, vec![0xF, 0x34, 0xAB])];
             let mut eeprom = $create(&trans);
-            eeprom.write_byte(0x1234, 0xAB).unwrap();
+            eeprom.write_byte(0xF34, 0xAB).unwrap();
             destroy(eeprom);
         }
     };
@@ -243,7 +243,7 @@ macro_rules! write_empty_data_does_nothing {
         #[test]
         fn $name() {
             let mut eeprom = $create(&[]);
-            eeprom.write_page(0x34, &[]).unwrap();
+            eeprom.write_page(0xF, &[]).unwrap();
             destroy(eeprom);
         }
     };
@@ -267,9 +267,9 @@ macro_rules! can_write_array_v2 {
     ($name:ident, $create:ident, $page_size:expr) => {
         #[test]
         fn $name() {
-            let trans = [ I2cTrans::write(DEV_ADDR, vec![0x12, 0x34, 0xAB, 0xCD, 0xEF]) ];
+            let trans = [ I2cTrans::write(DEV_ADDR, vec![0xF, 0x34, 0xAB, 0xCD, 0xEF]) ];
             let mut eeprom = $create(&trans);
-            eeprom.write_page(0x1234, &[0xAB, 0xCD, 0xEF]).unwrap();
+            eeprom.write_page(0xF34, &[0xAB, 0xCD, 0xEF]).unwrap();
             destroy(eeprom);
         }
     };
@@ -324,11 +324,11 @@ macro_rules! can_write_whole_page_v2 {
     ($name:ident, $create:ident, $size:expr) => {
         #[test]
         fn $name() {
-            let mut data = vec![0x12, 0x34];
+            let mut data = vec![0xF, 0x34];
             data.extend_from_slice(&[0xAB; $size]);
             let trans = [I2cTrans::write(DEV_ADDR, data)];
             let mut eeprom = $create(&trans);
-            eeprom.write_page(0x1234, &[0xAB; $size]).unwrap();
+            eeprom.write_page(0xF34, &[0xAB; $size]).unwrap();
             destroy(eeprom);
         }
     };

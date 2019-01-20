@@ -199,9 +199,10 @@ impl SlaveAddr {
     }
 
     /// Get the device address possibly including some bits from the memory address
-    fn devaddr(self, memory_address: u32, devmask: u8, shift: u8) -> u8 {
-        let hi = ((memory_address >> shift) as u8) & devmask;
-        (self.addr() & !(devmask as u8)) | hi
+    fn devaddr(self, memory_address: u32, address_bits: u8, shift: u8) -> u8 {
+        let devmask = ((1 << address_bits) - 1) >> shift;
+        let hi = (memory_address & !(1 << address_bits)) >> shift;
+        (self.addr() & !(devmask as u8)) | hi as u8
     }
 }
 
@@ -241,8 +242,8 @@ pub struct Eeprom24x<I2C, PS, AS> {
     i2c: I2C,
     /// The I²C device address.
     address: SlaveAddr,
-    /// Bitmask of the bits in the device address that are used as part of the memory address.
-    devmask: u8,
+    /// Number or bits used for memory addressing.
+    address_bits: u8,
     /// Page size marker type.
     _ps: PhantomData<PS>,
     /// Address size marker type.
@@ -263,10 +264,10 @@ where
     AS: private::MultiSizeAddr,
 {
     fn get_device_address<E>(&self, memory_address: u32) -> Result<u8, Error<E>> {
-        if AS::is_address_invalid(memory_address, self.devmask) {
+        if AS::is_address_invalid(memory_address, self.address_bits) {
             return Err(Error::InvalidAddr);
         }
-        let addr = self.address.devaddr(memory_address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+        let addr = self.address.devaddr(memory_address, self.address_bits, AS::ADDRESS_BYTES as u8 * 8);
         Ok(addr)
     }
 }
@@ -277,7 +278,7 @@ mod private {
     pub trait Sealed {}
 
     pub trait MultiSizeAddr : Sealed {
-        fn is_address_invalid(address: u32, devmask: u8) -> bool;
+        fn is_address_invalid(address: u32, address_bits: u8) -> bool;
         fn fill_address(address: u32, payload: &mut [u8]);
         const ADDRESS_BYTES: usize;
     }
@@ -289,8 +290,8 @@ mod private {
 impl private::MultiSizeAddr for addr_size::One {
     const ADDRESS_BYTES: usize = 1;
 
-    fn is_address_invalid(address: u32, devmask: u8) -> bool {
-        ((address >> 8) & !u32::from(devmask)) > 0
+    fn is_address_invalid(address: u32, address_bits: u8) -> bool {
+        address >= (1 << address_bits)
     }
 
     fn fill_address(address: u32, payload: &mut [u8]) {
@@ -301,8 +302,8 @@ impl private::MultiSizeAddr for addr_size::One {
 impl private::MultiSizeAddr for addr_size::Two {
     const ADDRESS_BYTES: usize = 2;
 
-    fn is_address_invalid(address: u32, devmask: u8) -> bool {
-        ((address >> 16) & !u32::from(devmask)) > 0
+    fn is_address_invalid(address: u32, address_bits: u8) -> bool {
+        address >= (1 << address_bits)
     }
 
     fn fill_address(address: u32, payload: &mut [u8]) {
@@ -384,7 +385,7 @@ where
         Eeprom24x {
             i2c,
             address,
-            devmask: 0x0,
+            address_bits: 4,
             _ps: PhantomData,
             _as: PhantomData,
         }
@@ -392,47 +393,50 @@ where
 }
 
 macro_rules! impl_create {
-    ( $dev:expr, $part:expr, $mask:expr, $create:ident ) => {
+    ( $dev:expr, $part:expr, $address_bits:expr, $create:ident ) => {
         impl_create!{
-            @gen [$create, $mask, concat!("Create a new instance of a ", $dev, " device (e.g. ", $part, ")")]
+            @gen [$create, $address_bits,
+                concat!("Create a new instance of a ", $dev, " device (e.g. ", $part, ")")]
         }
     };
 
-    (@gen [$create:ident, $mask:expr, $doc:expr] ) => {
+    (@gen [$create:ident, $address_bits:expr, $doc:expr] ) => {
         #[doc = $doc]
         pub fn $create(i2c: I2C, address: SlaveAddr) -> Self {
-            Self::new(i2c, address, $mask)
+            Self::new(i2c, address, $address_bits)
         }
     };
 }
 
 // This macro could be simplified once https://github.com/rust-lang/rust/issues/42863 is fixed.
 macro_rules! impl_for_page_size {
-    ( $AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ) => {
+    ( $AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr,
+        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident ] ),* ) => {
         impl_for_page_size!{
             @gen [$AS, $addr_bytes, $PS, $page_size,
             concat!("Specialization for devices with a page size of ", stringify!($page_size), " bytes."),
             concat!("Create generic instance for devices with a page size of ", stringify!($page_size), " bytes."),
-            $( [ $dev, $part, $mask, $create ] ),* ]
+            $( [ $dev, $part, $address_bits, $create ] ),* ]
         }
     };
 
-    (@gen [$AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr, $( [ $dev:expr, $part:expr, $mask:expr, $create:ident ] ),* ] ) => {
+    (@gen [$AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr,
+        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident ] ),* ] ) => {
         #[doc = $doc_impl]
         impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::$AS>
         where
             I2C: Write<Error = E>
         {
             $(
-                impl_create!($dev, $part, $mask, $create);
+                impl_create!($dev, $part, $address_bits, $create);
             )*
 
             #[doc = $doc_new]
-            fn new(i2c: I2C, address: SlaveAddr, devmask: u8) -> Self {
+            fn new(i2c: I2C, address: SlaveAddr, address_bits: u8) -> Self {
                 Eeprom24x {
                     i2c,
                     address,
-                    devmask,
+                    address_bits,
                     _ps: PhantomData,
                     _as: PhantomData,
                 }
@@ -482,43 +486,43 @@ impl_for_page_size!(
     One, 1,
     B8,
     8,
-    ["24x01", "AT24C01", 0b000, new_24x01],
-    ["24x02", "AT24C02", 0b000, new_24x02]
+    ["24x01", "AT24C01", 7, new_24x01],
+    ["24x02", "AT24C02", 8, new_24x02]
 );
 impl_for_page_size!(
     One, 1,
     B16,
     16,
-    ["24x04", "AT24C04", 0b001, new_24x04],
-    ["24x08", "AT24C08", 0b011, new_24x08],
-    ["24x16", "AT24C16", 0b111, new_24x16]
+    ["24x04", "AT24C04", 9, new_24x04],
+    ["24x08", "AT24C08", 10, new_24x08],
+    ["24x16", "AT24C16", 11, new_24x16]
 );
 impl_for_page_size!(
     Two, 2,
     B32,
     32,
-    ["24x32", "AT24C32", 0b000, new_24x32],
-    ["24x64", "AT24C64", 0b000, new_24x64]
+    ["24x32", "AT24C32", 12, new_24x32],
+    ["24x64", "AT24C64", 13, new_24x64]
 );
 impl_for_page_size!(
     Two, 2,
     B64,
     64,
-    ["24x128", "AT24C128", 0b000, new_24x128],
-    ["24x256", "AT24C256", 0b000, new_24x256]
+    ["24x128", "AT24C128", 14, new_24x128],
+    ["24x256", "AT24C256", 15, new_24x256]
 );
 impl_for_page_size!(
     Two, 2,
     B128,
     128,
-    ["24x512", "AT24C512", 0b000, new_24x512]
+    ["24x512", "AT24C512", 16, new_24x512]
 );
 impl_for_page_size!(
     Two, 2,
     B256,
     256,
-    ["24xM01", "AT24CM01", 0b001, new_24xm01],
-    ["24xM02", "AT24CM02", 0b011, new_24xm02]
+    ["24xM01", "AT24CM01", 17, new_24xm01],
+    ["24xM02", "AT24CM02", 18, new_24xm02]
 );
 
 #[cfg(test)]
