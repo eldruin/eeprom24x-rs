@@ -1,6 +1,7 @@
 use eeprom24x::{addr_size, page_size, Eeprom24x, SlaveAddr};
 use hal::i2c::{Mock as I2cMock, Transaction as I2cTrans};
 
+#[allow(unused)]
 pub const DEV_ADDR: u8 = 0b101_0000;
 
 macro_rules! create {
