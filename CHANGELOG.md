@@ -23,9 +23,9 @@ addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02`.
 
 ## [0.2.1] - 2019-01-20
 ### Removed
-- Removed support for devices that use some device address bits for memory
-addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02` as the addressing was
-erroneous. Please upgrade to version `0.3.0` to use them.
+- [breaking-change] Removed support for devices that use some device address
+bits for memory addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02` as
+the addressing was erroneous. Please upgrade to version `0.3.0` to use them.
 
 ## [0.2.0] - 2018-11-22
 ### Added
