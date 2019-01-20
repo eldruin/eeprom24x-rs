@@ -251,10 +251,16 @@ pub struct Eeprom24x<I2C, PS, AS> {
 
 /// Common methods
 impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
+where
+    AS: private::MultiSizeAddr,
 {
     /// Destroy driver instance, return I²C bus instance.
     pub fn destroy(self) -> I2C {
         self.i2c
+    }
+
+    fn get_device_address(&self, memory_address: u32) -> u8 {
+        self.address.devaddr(memory_address, self.devmask, AS::ADDRESS_BYTES as u8 * 8)
     }
 }
 
@@ -315,7 +321,7 @@ where
             return Err(Error::InvalidAddr);
         }
 
-        let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+        let devaddr = self.get_device_address(address);
         let mut payload = [0; 3];
         AS::fill_address(address, &mut payload);
         payload[AS::ADDRESS_BYTES] = data;
@@ -330,7 +336,7 @@ where
             return Err(Error::InvalidAddr);
         }
 
-        let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+        let devaddr = self.get_device_address(address);
         let mut memaddr = [0; 2];
         AS::fill_address(address, &mut memaddr);
         let mut data = [0; 1];
@@ -346,7 +352,7 @@ where
             return Err(Error::InvalidAddr);
         }
 
-        let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+        let devaddr = self.get_device_address(address);
         let mut memaddr = [0; 2];
         AS::fill_address(address, &mut memaddr);
         self.i2c
@@ -467,7 +473,7 @@ macro_rules! impl_for_page_size {
                     return Err(Error::TooMuchData);
                 }
 
-                let devaddr = self.address.devaddr(address, self.devmask, AS::ADDRESS_BYTES as u8 * 8);
+                let devaddr = self.get_device_address(address);
                 let mut payload: [u8; $addr_bytes + $page_size] = [0; $addr_bytes + $page_size];
                 AS::fill_address(address, &mut payload);
                 payload[$addr_bytes..$addr_bytes + data.len()].copy_from_slice(&data);
