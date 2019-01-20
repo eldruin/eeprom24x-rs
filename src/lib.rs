@@ -264,7 +264,7 @@ where
     AS: private::MultiSizeAddr,
 {
     fn get_device_address<E>(&self, memory_address: u32) -> Result<u8, Error<E>> {
-        if AS::is_address_invalid(memory_address, self.address_bits) {
+        if memory_address >= (1 << self.address_bits) {
             return Err(Error::InvalidAddr);
         }
         let addr = self.address.devaddr(memory_address, self.address_bits, AS::ADDRESS_BYTES as u8 * 8);
@@ -278,9 +278,9 @@ mod private {
     pub trait Sealed {}
 
     pub trait MultiSizeAddr : Sealed {
-        fn is_address_invalid(address: u32, address_bits: u8) -> bool;
-        fn fill_address(address: u32, payload: &mut [u8]);
         const ADDRESS_BYTES: usize;
+
+        fn fill_address(address: u32, payload: &mut [u8]);
     }
 
     impl Sealed for addr_size::One {}
@@ -290,10 +290,6 @@ mod private {
 impl private::MultiSizeAddr for addr_size::One {
     const ADDRESS_BYTES: usize = 1;
 
-    fn is_address_invalid(address: u32, address_bits: u8) -> bool {
-        address >= (1 << address_bits)
-    }
-
     fn fill_address(address: u32, payload: &mut [u8]) {
         payload[0] = address as u8;
     }
@@ -301,10 +297,6 @@ impl private::MultiSizeAddr for addr_size::One {
 
 impl private::MultiSizeAddr for addr_size::Two {
     const ADDRESS_BYTES: usize = 2;
-
-    fn is_address_invalid(address: u32, address_bits: u8) -> bool {
-        address >= (1 << address_bits)
-    }
 
     fn fill_address(address: u32, payload: &mut [u8]) {
         payload[0] = (address >> 8) as u8;
