@@ -375,3 +375,19 @@ macro_rules! cannot_write_invalid_addr_v2 {
     };
 }
 for_all_ics_with_2b_addr!(cannot_write_invalid_addr_v2);
+
+#[test]
+fn can_use_device_address_for_memory_addressing_1byte() {
+    let trans = [I2cTrans::write(DEV_ADDR | 0x7, vec![0xBC, 0xAB])];
+    let mut eeprom = new_24x16(&trans);
+    eeprom.write_byte(0x7BC, 0xAB).unwrap();
+    destroy(eeprom);
+}
+
+#[test]
+fn can_use_device_address_for_memory_addressing_2byte() {
+    let trans = [I2cTrans::write(DEV_ADDR | 0x3, vec![0xBC, 0xDE, 0xAB])];
+    let mut eeprom = new_24xm02(&trans);
+    eeprom.write_byte(0x3BCDE, 0xAB).unwrap();
+    destroy(eeprom);
+}
