@@ -65,7 +65,11 @@ To use this driver, import this crate and an `embedded_hal` implementation,
 then instantiate the appropriate device.
 In the following examples an instance of the device AT24C256 will be created
 as an example. Other devices can be created with similar methods like:
-``Eeprom24x::new_24x64(...)``.
+`Eeprom24x::new_24x64(...)`.
+
+Please find additional examples using hardware in this repository: [driver-examples]
+
+[driver-examples]: https://github.com/eldruin/driver-examples
 
 ```rust
 extern crate eeprom24x;

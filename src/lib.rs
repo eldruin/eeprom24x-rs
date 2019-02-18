@@ -62,7 +62,12 @@
 //! There are many compatible vendors so the method has a somewhat generic name.
 //! For example, if you are using an AT24C32, you can create a device by calling
 //! `Eeprom24x::new_24x32(...)`.
-//! Please refer to the [device table](#the-devices) above for more examples.
+//! Please refer to the [device table](#the-devices) above for further examples
+//! of device names.
+//!
+//! Please find additional examples using hardware in this repository: [driver-examples]
+//!
+//! [driver-examples]: https://github.com/eldruin/driver-examples
 //!
 //! ### Instantiating with the default address
 //!
