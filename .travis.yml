@@ -32,25 +32,23 @@ matrix:
       rust: nightly
 
     - env: TARGET=x86_64-unknown-linux-musl
-      rust: nightly
+      rust: beta
+
+    # Minimum Supported Rust Version
+    - env: TARGET=x86_64-unknown-linux-gnu
+      rust: 1.31.0
 
     # Raspberry Pi 1
     - env: TARGET=arm-unknown-linux-gnueabi DISABLE_EXAMPLES=1 DISABLE_TESTS=1
-      rust: nightly
 
     # Raspberry Pi 2, 3, etc
     - env: TARGET=armv7-unknown-linux-gnueabihf DISABLE_EXAMPLES=1 DISABLE_TESTS=1
-      rust: nightly
 
     # Bare metal
     - env: TARGET=thumbv6m-none-eabi
-      rust: beta
     - env: TARGET=thumbv7em-none-eabi
-      rust: beta
     - env: TARGET=thumbv7em-none-eabihf
-      rust: beta
     - env: TARGET=thumbv7m-none-eabi
-      rust: beta
 
 install:
   bash ci/install.sh
