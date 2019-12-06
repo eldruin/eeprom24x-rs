@@ -9,7 +9,7 @@ macro_rules! create {
         pub fn $create(
             transactions: &[I2cTrans],
         ) -> Eeprom24x<I2cMock, page_size::$PS, addr_size::$AS> {
-            Eeprom24x::$create(I2cMock::new(&transactions), SlaveAddr::default())
+            Eeprom24x::$create(I2cMock::new(transactions), SlaveAddr::default())
         }
     };
 }
