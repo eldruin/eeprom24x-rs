@@ -191,7 +191,6 @@ pub mod addr_size {
     pub struct TwoBytes(());
 }
 
-
 /// Page size markers
 pub mod page_size {
     /// No page write supported. e.g. for AT24x00

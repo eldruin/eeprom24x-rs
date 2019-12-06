@@ -12,11 +12,9 @@ impl SlaveAddr {
     pub(crate) fn addr(self) -> u8 {
         match self {
             SlaveAddr::Default => 0b101_0000,
-            SlaveAddr::Alternative(a2, a1, a0) =>
-                SlaveAddr::default().addr() |
-                ((a2 as u8) << 2)           |
-                ((a1 as u8) << 1)           |
-                  a0 as u8
+            SlaveAddr::Alternative(a2, a1, a0) => {
+                SlaveAddr::default().addr() | ((a2 as u8) << 2) | ((a1 as u8) << 1) | a0 as u8
+            }
         }
     }
 
@@ -40,10 +38,22 @@ mod tests {
 
     #[test]
     fn can_generate_alternative_addresses() {
-        assert_eq!(0b101_0000, SlaveAddr::Alternative(false, false, false).addr());
-        assert_eq!(0b101_0001, SlaveAddr::Alternative(false, false,  true).addr());
-        assert_eq!(0b101_0010, SlaveAddr::Alternative(false,  true, false).addr());
-        assert_eq!(0b101_0100, SlaveAddr::Alternative( true, false, false).addr());
-        assert_eq!(0b101_0111, SlaveAddr::Alternative( true,  true,  true).addr());
+        assert_eq!(
+            0b101_0000,
+            SlaveAddr::Alternative(false, false, false).addr()
+        );
+        assert_eq!(
+            0b101_0001,
+            SlaveAddr::Alternative(false, false, true).addr()
+        );
+        assert_eq!(
+            0b101_0010,
+            SlaveAddr::Alternative(false, true, false).addr()
+        );
+        assert_eq!(
+            0b101_0100,
+            SlaveAddr::Alternative(true, false, false).addr()
+        );
+        assert_eq!(0b101_0111, SlaveAddr::Alternative(true, true, true).addr());
     }
 }
