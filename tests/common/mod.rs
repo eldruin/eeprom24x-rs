@@ -37,14 +37,14 @@ macro_rules! for_all_ics {
     ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x00,  new_24x00);
-            $name!(for_24x01,  new_24x01);
-            $name!(for_24x02,  new_24x02);
-            $name!(for_24x04,  new_24x04);
-            $name!(for_24x08,  new_24x08);
-            $name!(for_24x16,  new_24x16);
-            $name!(for_24x32,  new_24x32);
-            $name!(for_24x64,  new_24x64);
+            $name!(for_24x00, new_24x00);
+            $name!(for_24x01, new_24x01);
+            $name!(for_24x02, new_24x02);
+            $name!(for_24x04, new_24x04);
+            $name!(for_24x08, new_24x08);
+            $name!(for_24x16, new_24x16);
+            $name!(for_24x32, new_24x32);
+            $name!(for_24x64, new_24x64);
             $name!(for_24x128, new_24x128);
             $name!(for_24x256, new_24x256);
             $name!(for_24x512, new_24x512);
@@ -74,8 +74,8 @@ macro_rules! for_all_ics_with_2b_addr {
     ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x32,  new_24x32);
-            $name!(for_24x64,  new_24x64);
+            $name!(for_24x32, new_24x32);
+            $name!(for_24x64, new_24x64);
             $name!(for_24x128, new_24x128);
             $name!(for_24x256, new_24x256);
             $name!(for_24x512, new_24x512);
@@ -104,10 +104,10 @@ macro_rules! for_all_ics_with_2b_addr_and_page_size {
     ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x32,  new_24x32,   32);
-            $name!(for_24x64,  new_24x64,   32);
-            $name!(for_24x128, new_24x128,  64);
-            $name!(for_24x256, new_24x256,  64);
+            $name!(for_24x32, new_24x32, 32);
+            $name!(for_24x64, new_24x64, 32);
+            $name!(for_24x128, new_24x128, 64);
+            $name!(for_24x256, new_24x256, 64);
             $name!(for_24x512, new_24x512, 128);
             $name!(for_24xm01, new_24xm01, 256_usize);
             $name!(for_24xm02, new_24xm02, 256_usize);
@@ -120,15 +120,15 @@ macro_rules! for_all_ics_with_page_size {
     ($name:ident) => {
         mod $name {
             use super::*;
-            $name!(for_24x01,  new_24x01,    8);
-            $name!(for_24x02,  new_24x02,    8);
-            $name!(for_24x04,  new_24x04,   16);
-            $name!(for_24x08,  new_24x08,   16);
-            $name!(for_24x16,  new_24x16,   16);
-            $name!(for_24x32,  new_24x32,   32);
-            $name!(for_24x64,  new_24x64,   32);
-            $name!(for_24x128, new_24x128,  64);
-            $name!(for_24x256, new_24x256,  64);
+            $name!(for_24x01, new_24x01, 8);
+            $name!(for_24x02, new_24x02, 8);
+            $name!(for_24x04, new_24x04, 16);
+            $name!(for_24x08, new_24x08, 16);
+            $name!(for_24x16, new_24x16, 16);
+            $name!(for_24x32, new_24x32, 32);
+            $name!(for_24x64, new_24x64, 32);
+            $name!(for_24x128, new_24x128, 64);
+            $name!(for_24x256, new_24x256, 64);
             $name!(for_24x512, new_24x512, 128);
             $name!(for_24xm01, new_24xm01, 256);
             $name!(for_24xm02, new_24xm02, 256);

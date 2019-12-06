@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 use hal::blocking::i2c::{Write, WriteRead};
-use {addr_size, Eeprom24x, Error, page_size, private, SlaveAddr};
+use {addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
 
 pub trait MultiSizeAddr: private::Sealed {
     const ADDRESS_BYTES: usize;
@@ -264,7 +264,13 @@ impl_for_page_size!(
     ["24x128", "AT24C128", 14, new_24x128],
     ["24x256", "AT24C256", 15, new_24x256]
 );
-impl_for_page_size!(TwoBytes, 2, B128, 128, ["24x512", "AT24C512", 16, new_24x512]);
+impl_for_page_size!(
+    TwoBytes,
+    2,
+    B128,
+    128,
+    ["24x512", "AT24C512", 16, new_24x512]
+);
 impl_for_page_size!(
     TwoBytes,
     2,
