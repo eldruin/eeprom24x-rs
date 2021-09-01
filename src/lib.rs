@@ -192,7 +192,7 @@ pub mod page_size {
 }
 
 /// EEPROM24X driver
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Eeprom24x<I2C, PS, AS> {
     /// The concrete I²C device implementation.
     i2c: I2C,
