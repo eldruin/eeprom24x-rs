@@ -10,11 +10,11 @@
 //! - Write a byte to a memory address. See: [`write_byte()`].
 //! - Write a byte array (up to a memory page) to a memory address. See: [`write_page()`].
 //!
-//! [`read_byte()`]: struct.Eeprom24x.html#method.read_byte
-//! [`read_data()`]: struct.Eeprom24x.html#method.read_data
-//! [`read_current_address()`]: struct.Eeprom24x.html#method.read_current_address
-//! [`write_byte()`]: struct.Eeprom24x.html#method.write_byte
-//! [`write_page()`]: struct.Eeprom24x.html#method.write_page
+//! [`read_byte()`]: Eeprom24x::read_byte
+//! [`read_data()`]: Eeprom24x::read_data
+//! [`read_current_address()`]: Eeprom24x::read_current_address
+//! [`write_byte()`]: Eeprom24x::write_byte
+//! [`write_page()`]: Eeprom24x::write_page
 //!
 //! Can be used at least with the devices listed below.
 //!
