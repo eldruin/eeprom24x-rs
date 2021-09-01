@@ -148,7 +148,7 @@ pub enum Error<E> {
 ///
 /// Note that in some devices some of the address bits are used for memory addressing and
 /// will therefore be ignored.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SlaveAddr {
     /// Default slave address
     Default,
