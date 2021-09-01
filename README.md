@@ -72,10 +72,6 @@ Please find additional examples using hardware in this repository: [driver-examp
 [driver-examples]: https://github.com/eldruin/driver-examples
 
 ```rust
-extern crate eeprom24x;
-extern crate embedded_hal;
-extern crate linux_embedded_hal;
-
 use eeprom24x::{Eeprom24x, SlaveAddr};
 use embedded_hal::blocking::delay::DelayMs;
 use linux_embedded_hal::{Delay, I2cdev};

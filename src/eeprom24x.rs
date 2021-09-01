@@ -1,6 +1,6 @@
+use crate::{addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
 use core::marker::PhantomData;
-use hal::blocking::i2c::{Write, WriteRead};
-use {addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
+use embedded_hal::blocking::i2c::{Write, WriteRead};
 
 pub trait MultiSizeAddr: private::Sealed {
     const ADDRESS_BYTES: usize;
@@ -98,7 +98,7 @@ where
 /// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
 impl<I2C, E, PS, AS> Eeprom24x<I2C, PS, AS>
 where
-    I2C: hal::blocking::i2c::Read<Error = E>,
+    I2C: embedded_hal::blocking::i2c::Read<Error = E>,
 {
     /// Read the contents of the last address accessed during the last read
     /// or write operation, _incremented by one_.

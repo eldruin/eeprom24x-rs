@@ -1,4 +1,4 @@
-use SlaveAddr;
+use crate::SlaveAddr;
 
 impl Default for SlaveAddr {
     /// Default slave address
@@ -28,7 +28,6 @@ impl SlaveAddr {
 
 #[cfg(test)]
 mod tests {
-    extern crate embedded_hal_mock as hal;
     use super::*;
 
     #[test]

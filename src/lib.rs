@@ -75,27 +75,19 @@
 //! the device:
 //!
 //! ```no_run
-//! extern crate linux_embedded_hal as hal;
-//! extern crate eeprom24x;
-//!
-//! use hal::I2cdev;
+//! use linux_embedded_hal::I2cdev;
 //! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
-//! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let address = SlaveAddr::default();
 //! // using the AT24C256
 //! let mut eeprom = Eeprom24x::new_24x256(dev, address);
-//! # }
 //! ```
 //!
 //! ### Providing an alternative address
 //!
 //! ```no_run
-//! extern crate linux_embedded_hal as hal;
-//! extern crate eeprom24x;
-//!
-//! use hal::I2cdev;
+//! use linux_embedded_hal::I2cdev;
 //! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
 //! # fn main() {
@@ -106,16 +98,12 @@
 //! # }
 //! ```
 //!
-//! ### Writting and reading a byte
+//! ### Writing and reading a byte
 //!
 //! ```no_run
-//! extern crate linux_embedded_hal as hal;
-//! extern crate eeprom24x;
-//!
-//! use hal::I2cdev;
+//! use linux_embedded_hal::I2cdev;
 //! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
-//! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
 //! let address = 0x1234;
@@ -123,33 +111,26 @@
 //! eeprom.write_byte(address, data);
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
 //! let retrieved_data = eeprom.read_byte(address);
-//! # }
 //! ```
 //!
 //! ### Writting a page
 //!
 //! ```no_run
-//! extern crate linux_embedded_hal as hal;
-//! extern crate eeprom24x;
-//!
-//! use hal::I2cdev;
+//! use linux_embedded_hal::I2cdev;
 //! use eeprom24x::{ Eeprom24x, SlaveAddr };
 //!
-//! # fn main() {
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let mut eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
 //! let address = 0x1234;
 //! let data = [0xAB; 64];
 //! eeprom.write_page(address, &data);
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
-//! # }
 //! ```
 
 #![doc(html_root_url = "https://docs.rs/eeprom24x/0.3.0")]
 #![deny(missing_docs, unsafe_code)]
 #![no_std]
 
-extern crate embedded_hal as hal;
 use core::marker::PhantomData;
 
 /// All possible errors in this crate
@@ -226,7 +207,7 @@ pub struct Eeprom24x<I2C, PS, AS> {
 }
 
 mod private {
-    use addr_size;
+    use crate::addr_size;
 
     pub trait Sealed {}
 
