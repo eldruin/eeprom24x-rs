@@ -127,7 +127,7 @@
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
 //! ```
 
-#![doc(html_root_url = "https://docs.rs/eeprom24x/0.3.0")]
+#![doc(html_root_url = "https://docs.rs/eeprom24x/0.4.0")]
 #![deny(missing_docs, unsafe_code)]
 #![no_std]
 
