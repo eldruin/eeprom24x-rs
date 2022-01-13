@@ -202,7 +202,7 @@ macro_rules! impl_for_page_size {
                 }
 
                 // check this before to ensure that data.len() fits into u32
-                // ($page_size always fits as its maximum value es 256).
+                // ($page_size always fits as its maximum value is 256).
                 if data.len() > $page_size {
                     // This would actually be supported by the EEPROM but
                     // the data in the page would be overwritten
@@ -228,7 +228,28 @@ macro_rules! impl_for_page_size {
             }
         }
 
+        impl<I2C, E, AS> PageWrite<E> for Eeprom24x<I2C, page_size::$PS, AS>
+        where
+            I2C: Write<Error = E>,
+            AS: MultiSizeAddr,
+        {
+            fn page_write(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>> {
+                self.write_page(address, data)
+            }
+
+            fn page_size(&self) -> usize {
+                $page_size
+            }
+        }
+
     };
+}
+
+/// Helper trait which gives the Storage implementation access to the `write_page` method and
+/// information about the page size
+pub trait PageWrite<E> {
+    fn page_write(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>>;
+    fn page_size(&self) -> usize;
 }
 
 impl_for_page_size!(

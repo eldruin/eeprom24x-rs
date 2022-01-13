@@ -206,6 +206,16 @@ pub struct Eeprom24x<I2C, PS, AS> {
     _as: PhantomData<AS>,
 }
 
+/// EEPROM24X extension which supports the `embedded-storage` traits but requires an
+/// `embedded_hal::timer::CountDown` to handle the timeouts when writing over page boundaries
+#[derive(Debug)]
+pub struct Storage<I2C, PS, AS, CD> {
+    /// Eeprom driver over which we implement the Storage traits
+    pub eeprom: Eeprom24x<I2C, PS, AS>,
+    /// CountDown timer
+    count_down: CD,
+}
+
 mod private {
     use crate::addr_size;
 
@@ -217,3 +227,4 @@ mod private {
 
 mod eeprom24x;
 mod slave_addr;
+mod storage;
