@@ -60,10 +60,10 @@ where
         if offset as usize + bytes.len() > self.capacity() {
             return Err(Error::TooMuchData);
         }
-        while bytes.len() > 0 {
-            let this_page_index = offset as usize % self.eeprom.page_size();
-            let next_page_start = (this_page_index + 1) * self.eeprom.page_size();
-            let this_page_remaining = next_page_start - offset as usize;
+        while !bytes.is_empty() {
+            let page_size = self.eeprom.page_size();
+            let this_page_offset = offset as usize % page_size;
+            let this_page_remaining = page_size - this_page_offset;
             let chunk_size = min(bytes.len(), this_page_remaining);
             self.eeprom.page_write(offset, &bytes[..chunk_size])?;
             offset += chunk_size as u32;
