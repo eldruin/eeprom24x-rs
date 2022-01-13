@@ -246,7 +246,9 @@ impl_for_page_size!(
     16,
     ["24x04", "AT24C04", 9, new_24x04],
     ["24x08", "AT24C08", 10, new_24x08],
-    ["24x16", "AT24C16", 11, new_24x16]
+    ["24x16", "AT24C16", 11, new_24x16],
+    ["M24C01", "M24C01", 7, new_m24x01],
+    ["M24C02", "M24C02", 8, new_m24x02]
 );
 impl_for_page_size!(
     TwoBytes,
