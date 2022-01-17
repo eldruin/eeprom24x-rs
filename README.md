@@ -33,7 +33,9 @@ applications where low power and low voltage operation are essential.
 |-------:|------------:|------------:|----------:|:-----------|
 |  24x00 |    128 bits |          16 |       N/A | [24C00]    |
 |  24x01 |      1 Kbit |         128 |   8 bytes | [AT24C01]  |
-|  24x02 |      2 Kbit |         256 |   8 bytes | [AT24C02]  |
+| M24x01 |      1 Kbit |         128 |  16 bytes | [M24C01]   |
+|  24x02 |      2 Kbit |         256 |   8 bytes | [M24C02]   |
+| M24x02 |      2 Kbit |         256 |  16 bytes | [AT24C02]  |
 |  24x04 |      4 Kbit |         512 |  16 bytes | [AT24C04]  |
 |  24x08 |      8 Kbit |       1,024 |  16 bytes | [AT24C08]  |
 |  24x16 |     16 Kbit |       2,048 |  16 bytes | [AT24C16]  |
@@ -45,19 +47,21 @@ applications where low power and low voltage operation are essential.
 | 24xM01 |      1 Mbit |     131,072 | 256 bytes | [AT24CM01] |
 | 24xM02 |      2 Mbit |     262,144 | 256 bytes | [AT24CM02] |
 
-[24C00]: http://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
-[AT24C01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
-[AT24C02]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
-[AT24C04]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8896E-SEEPROM-AT24C04D-Datasheet.pdf
-[AT24C08]: http://ww1.microchip.com/downloads/en/DeviceDoc/AT24C08D-I2C-Compatible-2-Wire-Serial-EEPROM-20006022A.pdf
-[AT24C16]: http://ww1.microchip.com/downloads/en/DeviceDoc/20005858A.pdf
-[AT24C32]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
-[AT24C64]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
-[AT24C128]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
-[AT24C256]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
-[AT24C512]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
-[AT24CM01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8812-SEEPROM-AT24CM01-Datasheet.pdf
-[AT24CM02]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8828-SEEPROM-AT24CM02-Datasheet.pdf
+[24C00]: https://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
+[AT24C01]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
+[M24C01]: https://www.st.com/resource/en/datasheet/m24c01-r.pdf
+[AT24C02]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
+[M24C02]: https://www.st.com/resource/en/datasheet/m24c02-r.pdf
+[AT24C04]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8896E-SEEPROM-AT24C04D-Datasheet.pdf
+[AT24C08]: https://ww1.microchip.com/downloads/en/DeviceDoc/AT24C08D-I2C-Compatible-2-Wire-Serial-EEPROM-20006022A.pdf
+[AT24C16]: https://ww1.microchip.com/downloads/en/DeviceDoc/20005858A.pdf
+[AT24C32]: https://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
+[AT24C64]: https://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
+[AT24C128]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
+[AT24C256]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
+[AT24C512]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
+[AT24CM01]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8812-SEEPROM-AT24CM01-Datasheet.pdf
+[AT24CM02]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8828-SEEPROM-AT24CM02-Datasheet.pdf
 
 ## Usage
 

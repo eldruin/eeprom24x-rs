@@ -3,7 +3,8 @@ use embedded_hal_mock::i2c::Transaction as I2cTrans;
 mod common;
 use crate::common::{
     destroy, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x128, new_24x16,
-    new_24x256, new_24x32, new_24x512, new_24x64, new_24xm01, new_24xm02, DEV_ADDR,
+    new_24x256, new_24x32, new_24x512, new_24x64, new_24xm01, new_24xm02, new_m24x01, new_m24x02,
+    DEV_ADDR,
 };
 
 macro_rules! construction_test {

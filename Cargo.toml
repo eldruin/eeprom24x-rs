@@ -28,6 +28,7 @@ nb = "1.0.0"
 [dev-dependencies]
 linux-embedded-hal = "0.3"
 embedded-hal-mock = "0.8"
+void = "1.0.2"
 
 [profile.release]
 lto = true
