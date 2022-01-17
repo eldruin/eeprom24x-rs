@@ -16,6 +16,12 @@
 //! [`write_byte()`]: Eeprom24x::write_byte
 //! [`write_page()`]: Eeprom24x::write_page
 //!
+//! If an `embedded_hal::timer::CountDown` is available, the [`embedded-storage`] traits can
+//! additionally be used which allow to read the device capacity and write over page boundaries. To
+//! achieve the latter, the [`Eeprom24x`] has to be wrapped with [`Storage::new`].
+//!
+//! [`embedded-storage`]: https://github.com/rust-embedded-community/embedded-storage
+//!
 //! Can be used at least with the devices listed below.
 //!
 //! ## The devices
@@ -30,7 +36,9 @@
 //! |-------:|------------:|------------:|----------:|:-----------|
 //! |  24x00 |    128 bits |          16 |       N/A | [24C00]    |
 //! |  24x01 |      1 Kbit |         128 |   8 bytes | [AT24C01]  |
-//! |  24x02 |      2 Kbit |         256 |   8 bytes | [AT24C02]  |
+//! | M24x01 |      1 Kbit |         128 |  16 bytes | [M24C01]   |
+//! |  24x02 |      2 Kbit |         256 |   8 bytes | [M24C02]   |
+//! | M24x02 |      2 Kbit |         256 |  16 bytes | [AT24C02]  |
 //! |  24x04 |      4 Kbit |         512 |  16 bytes | [AT24C04]  |
 //! |  24x08 |      8 Kbit |       1,024 |  16 bytes | [AT24C08]  |
 //! |  24x16 |     16 Kbit |       2,048 |  16 bytes | [AT24C16]  |
@@ -42,19 +50,21 @@
 //! | 24xM01 |      1 Mbit |     131,072 | 256 bytes | [AT24CM01] |
 //! | 24xM02 |      2 Mbit |     262,144 | 256 bytes | [AT24CM02] |
 //!
-//! [24C00]: http://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
-//! [AT24C01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
-//! [AT24C02]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
-//! [AT24C04]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8896E-SEEPROM-AT24C04D-Datasheet.pdf
-//! [AT24C08]: http://ww1.microchip.com/downloads/en/DeviceDoc/AT24C08D-I2C-Compatible-2-Wire-Serial-EEPROM-20006022A.pdf
-//! [AT24C16]: http://ww1.microchip.com/downloads/en/DeviceDoc/20005858A.pdf
-//! [AT24C32]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
-//! [AT24C64]: http://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
-//! [AT24C128]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
-//! [AT24C256]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
-//! [AT24C512]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
-//! [AT24CM01]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8812-SEEPROM-AT24CM01-Datasheet.pdf
-//! [AT24CM02]: http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8828-SEEPROM-AT24CM02-Datasheet.pdf
+//! [24C00]: https://ww1.microchip.com/downloads/en/DeviceDoc/24AA00-24LC00-24C00-Data-Sheet-20001178J.pdf
+//! [AT24C01]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
+//! [M24C01]: https://www.st.com/resource/en/datasheet/m24c01-r.pdf
+//! [AT24C02]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8871F-SEEPROM-AT24C01D-02D-Datasheet.pdf
+//! [M24C02]: https://www.st.com/resource/en/datasheet/m24c02-r.pdf
+//! [AT24C04]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8896E-SEEPROM-AT24C04D-Datasheet.pdf
+//! [AT24C08]: https://ww1.microchip.com/downloads/en/DeviceDoc/AT24C08D-I2C-Compatible-2-Wire-Serial-EEPROM-20006022A.pdf
+//! [AT24C16]: https://ww1.microchip.com/downloads/en/DeviceDoc/20005858A.pdf
+//! [AT24C32]: https://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
+//! [AT24C64]: https://ww1.microchip.com/downloads/en/devicedoc/doc0336.pdf
+//! [AT24C128]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8734-SEEPROM-AT24C128C-Datasheet.pdf
+//! [AT24C256]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8568-SEEPROM-AT24C256C-Datasheet.pdf
+//! [AT24C512]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8720-SEEPROM-AT24C512C-Datasheet.pdf
+//! [AT24CM01]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8812-SEEPROM-AT24CM01-Datasheet.pdf
+//! [AT24CM02]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8828-SEEPROM-AT24CM02-Datasheet.pdf
 //!
 //! ## Usage examples (see also examples folder)
 //!
@@ -113,7 +123,7 @@
 //! let retrieved_data = eeprom.read_byte(address);
 //! ```
 //!
-//! ### Writting a page
+//! ### Writing a page
 //!
 //! ```no_run
 //! use linux_embedded_hal::I2cdev;
@@ -125,6 +135,23 @@
 //! let data = [0xAB; 64];
 //! eeprom.write_page(address, &data);
 //! // EEPROM enters internally-timed write cycle. Will not respond for some time.
+//! ```
+//!
+//! ### Using embedded-storage traits
+//!
+//! ```no_run
+//! use linux_embedded_hal::{I2cdev, SysTimer};
+//! use eeprom24x::{ Eeprom24x, SlaveAddr, Storage };
+//! use embedded_storage::{ReadStorage, Storage as _};
+//!
+//! let dev = I2cdev::new("/dev/i2c-1").unwrap();
+//! let eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
+//! let mut storage = Storage::new(eeprom, SysTimer::new());
+//! let _capacity = storage.capacity();
+//! let address = 0x1234;
+//! let data = [0xAB; 256];
+//! storage.write(address, &data);
+//! // EEPROM writes four pages. This introduces a delay of at least 20 ms, 5 ms per page.
 //! ```
 
 #![doc(html_root_url = "https://docs.rs/eeprom24x/0.4.0")]

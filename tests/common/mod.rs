@@ -20,7 +20,9 @@ pub fn destroy<T, V>(eeprom: Eeprom24x<I2cMock, T, V>) {
 
 create!(new_24x00, OneByte, No);
 create!(new_24x01, OneByte, B8);
+create!(new_m24x01, OneByte, B16);
 create!(new_24x02, OneByte, B8);
+create!(new_m24x02, OneByte, B16);
 create!(new_24x04, OneByte, B16);
 create!(new_24x08, OneByte, B16);
 create!(new_24x16, OneByte, B16);
@@ -39,7 +41,9 @@ macro_rules! for_all_ics {
             use super::*;
             $name!(for_24x00, new_24x00);
             $name!(for_24x01, new_24x01);
+            $name!(for_m24x01, new_m24x01);
             $name!(for_24x02, new_24x02);
+            $name!(for_m24x02, new_m24x02);
             $name!(for_24x04, new_24x04);
             $name!(for_24x08, new_24x08);
             $name!(for_24x16, new_24x16);
@@ -61,7 +65,9 @@ macro_rules! for_all_ics_with_1b_addr {
             use super::*;
             $name!(for_24x00, new_24x00);
             $name!(for_24x01, new_24x01);
+            $name!(for_m24x01, new_m24x01);
             $name!(for_24x02, new_24x02);
+            $name!(for_m24x02, new_m24x02);
             $name!(for_24x04, new_24x04);
             $name!(for_24x08, new_24x08);
             $name!(for_24x16, new_24x16);
@@ -91,7 +97,9 @@ macro_rules! for_all_ics_with_1b_addr_and_page_size {
         mod $name {
             use super::*;
             $name!(for_24x01, new_24x01, 8);
+            $name!(for_m24x01, new_m24x01, 16);
             $name!(for_24x02, new_24x02, 8);
+            $name!(for_m24x02, new_m24x02, 16);
             $name!(for_24x04, new_24x04, 16);
             $name!(for_24x08, new_24x08, 16);
             $name!(for_24x16, new_24x16, 16);
@@ -121,7 +129,9 @@ macro_rules! for_all_ics_with_page_size {
         mod $name {
             use super::*;
             $name!(for_24x01, new_24x01, 8);
+            $name!(for_m24x01, new_m24x01, 16);
             $name!(for_24x02, new_24x02, 8);
+            $name!(for_m24x02, new_m24x02, 16);
             $name!(for_24x04, new_24x04, 16);
             $name!(for_24x08, new_24x08, 16);
             $name!(for_24x16, new_24x16, 16);
@@ -132,6 +142,53 @@ macro_rules! for_all_ics_with_page_size {
             $name!(for_24x512, new_24x512, 128);
             $name!(for_24xm01, new_24xm01, 256);
             $name!(for_24xm02, new_24xm02, 256);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! for_all_ics_with_capacity {
+    ($name:ident) => {
+        mod $name {
+            use super::*;
+            $name!(for_24x00, new_24x00, 16);
+            $name!(for_24x01, new_24x01, 1 << 7);
+            $name!(for_m24x01, new_m24x01, 1 << 7);
+            $name!(for_24x02, new_24x02, 1 << 8);
+            $name!(for_m24x02, new_m24x02, 1 << 8);
+            $name!(for_24x04, new_24x04, 1 << 9);
+            $name!(for_24x08, new_24x08, 1 << 10);
+            $name!(for_24x16, new_24x16, 1 << 11);
+            $name!(for_24x32, new_24x32, 1 << 12);
+            $name!(for_24x64, new_24x64, 1 << 13);
+            $name!(for_24x128, new_24x128, 1 << 14);
+            $name!(for_24x256, new_24x256, 1 << 15);
+            $name!(for_24x512, new_24x512, 1 << 16);
+            $name!(for_24xm01, new_24xm01, 1 << 17);
+            $name!(for_24xm02, new_24xm02, 1 << 18);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! for_all_writestorage_ics_with_capacity {
+    ($name:ident) => {
+        mod $name {
+            use super::*;
+            $name!(for_24x01, new_24x01, 1 << 7);
+            $name!(for_m24x01, new_m24x01, 1 << 7);
+            $name!(for_24x02, new_24x02, 1 << 8);
+            $name!(for_m24x02, new_m24x02, 1 << 8);
+            $name!(for_24x04, new_24x04, 1 << 9);
+            $name!(for_24x08, new_24x08, 1 << 10);
+            $name!(for_24x16, new_24x16, 1 << 11);
+            $name!(for_24x32, new_24x32, 1 << 12);
+            $name!(for_24x64, new_24x64, 1 << 13);
+            $name!(for_24x128, new_24x128, 1 << 14);
+            $name!(for_24x256, new_24x256, 1 << 15);
+            $name!(for_24x512, new_24x512, 1 << 16);
+            $name!(for_24xm01, new_24xm01, 1 << 17);
+            $name!(for_24xm02, new_24xm02, 1 << 18);
         }
     };
 }

@@ -13,13 +13,7 @@ use embedded_storage::ReadStorage;
 impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {}
 
 /// Common methods
-impl<I2C, E, PS, AS, CD> Storage<I2C, PS, AS, CD>
-where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
-    AS: MultiSizeAddr,
-    Eeprom24x<I2C, PS, AS>: PageWrite<E>,
-    CD: CountDown<Time = Duration>,
-{
+impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {
     /// Create a new Storage instance wrapping the given Eeprom
     pub fn new(eeprom: Eeprom24x<I2C, PS, AS>, count_down: CD) -> Self {
         Storage { eeprom, count_down }
@@ -35,7 +29,6 @@ impl<I2C, E, PS, AS, CD> embedded_storage::ReadStorage for Storage<I2C, PS, AS, 
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
     AS: MultiSizeAddr,
-    Eeprom24x<I2C, PS, AS>: PageWrite<E>,
     CD: CountDown<Time = Duration>,
 {
     type Error = Error<E>;
