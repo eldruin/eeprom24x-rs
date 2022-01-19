@@ -53,8 +53,8 @@ where
         if offset as usize + bytes.len() > self.capacity() {
             return Err(Error::TooMuchData);
         }
+        let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            let page_size = self.eeprom.page_size();
             let this_page_offset = offset as usize % page_size;
             let this_page_remaining = page_size - this_page_offset;
             let chunk_size = min(bytes.len(), this_page_remaining);
@@ -67,7 +67,7 @@ where
             // A (theoretically needless) delay after the last page write ensures that the user can
             // call Storage::write() again immediately.
             self.count_down.start(Duration::from_millis(5));
-            nb::block!(self.count_down.wait()).unwrap(); // CountDown::wait() never fails
+            let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
         }
         Ok(())
     }
