@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
 - Add support for STM M24C01 and M24C02.
 - Implement `embedded_storage::ReadStorage` and `embedded_storage::Storage` traits.
-- ...
+
+### Changed
+- [breaking-change] Increase MSRV to version 1.51.0.
 
 ## [0.4.0] - 2021-09-04
 ### Added

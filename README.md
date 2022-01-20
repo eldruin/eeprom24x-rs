@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/eeprom24x.svg)](https://crates.io/crates/eeprom24x)
 [![Docs](https://docs.rs/eeprom24x/badge.svg)](https://docs.rs/eeprom24x)
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.31+-blue.svg)
+![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.51+-blue.svg)
 [![Build Status](https://github.com/eldruin/eeprom24x-rs/workflows/Build/badge.svg)](https://github.com/eldruin/eeprom24x-rs/actions?query=workflow%3ABuild)
 [![Coverage Status](https://coveralls.io/repos/eldruin/eeprom24x-rs/badge.svg?branch=master)](https://coveralls.io/r/eldruin/eeprom24x-rs?branch=master)
 
@@ -123,4 +123,3 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall
 be dual licensed as above, without any additional terms or conditions.
-
