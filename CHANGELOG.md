@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.5.0] - 2022-01-20
 ### Added
 - Add support for STM M24C01 and M24C02.
 - Implement `embedded_storage::ReadStorage` and `embedded_storage::Storage` traits.
@@ -63,7 +64,8 @@ This is the initial release to crates.io of the feature-complete driver. There
 may be some API changes in the future, in case I decide that something can be
 further improved. All changes will be documented in this CHANGELOG.
 
-[Unreleased]: https://github.com/eldruin/eeprom24x-rs/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/eldruin/eeprom24x-rs/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/eldruin/eeprom24x-rs/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/eldruin/eeprom24x-rs/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/eldruin/eeprom24x-rs/compare/v0.2.0...v0.3.0
 [0.2.1]: https://github.com/eldruin/eeprom24x-rs/compare/v0.2.0...v0.2.1
