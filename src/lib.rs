@@ -154,7 +154,6 @@
 //! // EEPROM writes four pages. This introduces a delay of at least 20 ms, 5 ms per page.
 //! ```
 
-#![doc(html_root_url = "https://docs.rs/eeprom24x/0.4.0")]
 #![deny(missing_docs, unsafe_code)]
 #![no_std]
 
