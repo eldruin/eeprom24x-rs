@@ -71,7 +71,7 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+            //let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
             let this_page_offset = offset as usize % page_size;
             let this_page_remaining = page_size - this_page_offset;
             let chunk_size = min(bytes.len(), this_page_remaining);
@@ -112,7 +112,7 @@ where
             // TODO Currently outdated comment:
             // A (theoretically needless) delay after the last page write ensures that the user can
             // call Storage::write() again immediately.
-            self.count_down.start(Duration::from_millis(5));
+            //self.count_down.start(Duration::from_millis(5));
         }
         Ok(())
     }
