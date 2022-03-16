@@ -25,6 +25,7 @@ resolver = "2"
 embedded-hal = "0.2"
 embedded-storage = "0.2.0"
 nb = "1.0.0"
+embedded-timeout-macros = "0.3"
 
 [dev-dependencies]
 linux-embedded-hal = "0.3"
