@@ -71,7 +71,7 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            if self.eeprom.polling {
+            if !self.eeprom.polling {
                 let _ = nb::block!(self.count_down.wait());
             }
 
