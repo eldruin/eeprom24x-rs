@@ -1,4 +1,8 @@
-use crate::{addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
+use crate::{
+    addr_size, page_size,
+    polling::{self, NoPolling, Polling},
+    private, Eeprom24x, Error, SlaveAddr,
+};
 use core::marker::PhantomData;
 use embedded_hal::blocking::i2c::{Write, WriteRead};
 
@@ -23,6 +27,18 @@ impl MultiSizeAddr for addr_size::TwoBytes {
         payload[0] = (address >> 8) as u8;
         payload[1] = address as u8;
     }
+}
+
+pub trait HasPollingSupport {
+    const SUPPORT: bool;
+}
+
+impl HasPollingSupport for polling::Polling {
+    const SUPPORT: bool = true;
+}
+
+impl HasPollingSupport for polling::NoPolling {
+    const SUPPORT: bool = false;
 }
 
 /// Common methods
@@ -124,6 +140,7 @@ where
             i2c,
             address,
             address_bits: 4,
+            polling: false,
             _ps: PhantomData,
             _as: PhantomData,
         }
@@ -131,17 +148,17 @@ where
 }
 
 macro_rules! impl_create {
-    ( $dev:expr, $part:expr, $address_bits:expr, $create:ident ) => {
+    ( $dev:expr, $part:expr, $address_bits:expr, $create:ident, $HPS:ident ) => {
         impl_create! {
             @gen [$create, $address_bits,
-                concat!("Create a new instance of a ", $dev, " device (e.g. ", $part, ")")]
+                concat!("Create a new instance of a ", $dev, " device (e.g. ", $part, ")"), $HPS]
         }
     };
 
-    (@gen [$create:ident, $address_bits:expr, $doc:expr] ) => {
+    (@gen [$create:ident, $address_bits:expr, $doc:expr, $HPS:ident] ) => {
         #[doc = $doc]
         pub fn $create(i2c: I2C, address: SlaveAddr) -> Self {
-            Self::new(i2c, address, $address_bits)
+            Self::new(i2c, address, $address_bits, $HPS::SUPPORT)
         }
     };
 }
@@ -149,32 +166,33 @@ macro_rules! impl_create {
 // This macro could be simplified once https://github.com/rust-lang/rust/issues/42863 is fixed.
 macro_rules! impl_for_page_size {
     ( $AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr,
-        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident ] ),* ) => {
+        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident, $HPS:ident ] ),* ) => {
         impl_for_page_size!{
             @gen [$AS, $addr_bytes, $PS, $page_size,
             concat!("Specialization for devices with a page size of ", stringify!($page_size), " bytes."),
             concat!("Create generic instance for devices with a page size of ", stringify!($page_size), " bytes."),
-            $( [ $dev, $part, $address_bits, $create ] ),* ]
+            $( [ $dev, $part, $address_bits, $create, $HPS ] ),* ]
         }
     };
 
     (@gen [$AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr,
-        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident ] ),* ] ) => {
+        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident, $HPS:ident] ),* ] ) => {
         #[doc = $doc_impl]
         impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::$AS>
         where
-            I2C: Write<Error = E>
+            I2C: Write<Error = E>,
         {
             $(
-                impl_create!($dev, $part, $address_bits, $create);
+                impl_create!($dev, $part, $address_bits, $create, $HPS);
             )*
 
             #[doc = $doc_new]
-            fn new(i2c: I2C, address: SlaveAddr, address_bits: u8) -> Self {
+            fn new(i2c: I2C, address: SlaveAddr, address_bits: u8, polling_support: bool) -> Self {
                 Eeprom24x {
                     i2c,
                     address,
                     address_bits,
+                    polling: polling_support,
                     _ps: PhantomData,
                     _as: PhantomData,
                 }
@@ -257,48 +275,48 @@ impl_for_page_size!(
     1,
     B8,
     8,
-    ["24x01", "AT24C01", 7, new_24x01],
-    ["24x02", "AT24C02", 8, new_24x02]
+    ["24x01", "AT24C01", 7, new_24x01, NoPolling],
+    ["24x02", "AT24C02", 8, new_24x02, NoPolling]
 );
 impl_for_page_size!(
     OneByte,
     1,
     B16,
     16,
-    ["24x04", "AT24C04", 9, new_24x04],
-    ["24x08", "AT24C08", 10, new_24x08],
-    ["24x16", "AT24C16", 11, new_24x16],
-    ["M24C01", "M24C01", 7, new_m24x01],
-    ["M24C02", "M24C02", 8, new_m24x02]
+    ["24x04", "AT24C04", 9, new_24x04, NoPolling],
+    ["24x08", "AT24C08", 10, new_24x08, NoPolling],
+    ["24x16", "AT24C16", 11, new_24x16, NoPolling],
+    ["M24C01", "M24C01", 7, new_m24x01, Polling],
+    ["M24C02", "M24C02", 8, new_m24x02, Polling]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B32,
     32,
-    ["24x32", "AT24C32", 12, new_24x32],
-    ["24x64", "AT24C64", 13, new_24x64]
+    ["24x32", "AT24C32", 12, new_24x32, NoPolling],
+    ["24x64", "AT24C64", 13, new_24x64, NoPolling]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B64,
     64,
-    ["24x128", "AT24C128", 14, new_24x128],
-    ["24x256", "AT24C256", 15, new_24x256]
+    ["24x128", "AT24C128", 14, new_24x128, NoPolling],
+    ["24x256", "AT24C256", 15, new_24x256, NoPolling]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B128,
     128,
-    ["24x512", "AT24C512", 16, new_24x512]
+    ["24x512", "AT24C512", 16, new_24x512, NoPolling]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B256,
     256,
-    ["24xM01", "AT24CM01", 17, new_24xm01],
-    ["24xM02", "AT24CM02", 18, new_24xm02]
+    ["24xM01", "AT24CM01", 17, new_24xm01, NoPolling],
+    ["24xM02", "AT24CM02", 18, new_24xm02, NoPolling]
 );

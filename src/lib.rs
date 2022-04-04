@@ -217,6 +217,14 @@ pub mod page_size {
     pub struct B256(());
 }
 
+/// Eeprom supports polling
+pub mod polling {
+    /// has polling support
+    pub struct Polling(());
+    /// has no polling support
+    pub struct NoPolling(());
+}
+
 /// EEPROM24X driver
 #[derive(Debug)]
 pub struct Eeprom24x<I2C, PS, AS> {
@@ -226,6 +234,8 @@ pub struct Eeprom24x<I2C, PS, AS> {
     address: SlaveAddr,
     /// Number or bits used for memory addressing.
     address_bits: u8,
+    /// Has polling Support
+    polling: bool,
     /// Page size marker type.
     _ps: PhantomData<PS>,
     /// Address size marker type.

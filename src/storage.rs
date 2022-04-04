@@ -71,7 +71,10 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            //let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+            if self.eeprom.polling {
+                let _ = nb::block!(self.count_down.wait());
+            }
+
             let this_page_offset = offset as usize % page_size;
             let this_page_remaining = page_size - this_page_offset;
             let chunk_size = min(bytes.len(), this_page_remaining);
@@ -81,38 +84,41 @@ where
             // TODO At least ST's eeproms allow polling, i.e. trying the next i2c access which will
             // just be NACKed as long as the device is still busy. This could potentially speed up
             // the write process.
-            self.count_down.start(Duration::from_millis(10));
-            repeat_timeout!(
-                &mut self.count_down,
-                {
-                    match self.eeprom.read_byte(0){
-                        // ready (ACK)
-                        Ok(_) => {
-                            Ok(())
-                        }
+            if self.eeprom.polling {
+                self.count_down.start(Duration::from_millis(5));
+                repeat_timeout!(
+                    &mut self.count_down,
+                    {
+                        match self.eeprom.read_byte(0){
+                            // ready (ACK)
+                            Ok(_) => {
+                                Ok(())
+                            }
 
-                        // not yet ready (NACK)
-                        Err(Error::I2C(_)) => {Err(())}
+                            // not yet ready (NACK)
+                            Err(Error::I2C(_)) => {Err(())}
 
-                        // any other error
-                        Err(e) => {
-                            return  Err(e);
+                            // any other error
+                            Err(e) => {
+                                return  Err(e);
+                            }
                         }
-                    }
-                },
-                (_ack) {
-                    // eeprom done writing => Leaving
-                    break;
-                };
-                (_nack) {
-                    // eeprom still busy
-                    continue;
-                };
-            );
+                    },
+                    (_ack) {
+                        // eeprom done writing => Leaving
+                        break;
+                    };
+                    (_nack) {
+                        // eeprom still busy
+                        continue;
+                    };
+                );
+            } else {
+                self.count_down.start(Duration::from_millis(5));
+            }
             // TODO Currently outdated comment:
             // A (theoretically needless) delay after the last page write ensures that the user can
             // call Storage::write() again immediately.
-            //self.count_down.start(Duration::from_millis(5));
         }
         Ok(())
     }
