@@ -81,11 +81,10 @@ where
             self.eeprom.page_write(offset, &bytes[..chunk_size])?;
             offset += chunk_size as u32;
             bytes = &bytes[chunk_size..];
-            // TODO At least ST's eeproms allow polling, i.e. trying the next i2c access which will
-            // just be NACKed as long as the device is still busy. This could potentially speed up
-            // the write process.
             if self.eeprom.polling {
+                // eeprom with polling support
                 self.count_down.start(Duration::from_millis(5));
+                // start polling
                 repeat_timeout!(
                     &mut self.count_down,
                     {
@@ -114,11 +113,10 @@ where
                     };
                 );
             } else {
+                // eeprom without polling support
+                // using timeout instead
                 self.count_down.start(Duration::from_millis(5));
             }
-            // TODO Currently outdated comment:
-            // A (theoretically needless) delay after the last page write ensures that the user can
-            // call Storage::write() again immediately.
         }
         Ok(())
     }
