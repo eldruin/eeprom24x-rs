@@ -71,19 +71,7 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            if !self.eeprom.polling {
-                let _ = nb::block!(self.count_down.wait());
-            }
-
-            let this_page_offset = offset as usize % page_size;
-            let this_page_remaining = page_size - this_page_offset;
-            let chunk_size = min(bytes.len(), this_page_remaining);
-            self.eeprom.page_write(offset, &bytes[..chunk_size])?;
-            offset += chunk_size as u32;
-            bytes = &bytes[chunk_size..];
-            if self.eeprom.polling {
-                // eeprom with polling support
-                self.count_down.start(Duration::from_millis(5));
+            if let crate::PollingSupport::Polling = self.eeprom.polling {
                 // start polling
                 repeat_timeout!(
                     &mut self.count_down,
@@ -113,10 +101,16 @@ where
                     };
                 );
             } else {
-                // eeprom without polling support
-                // using timeout instead
-                self.count_down.start(Duration::from_millis(5));
+                let _ = nb::block!(self.count_down.wait());
             }
+
+            let this_page_offset = offset as usize % page_size;
+            let this_page_remaining = page_size - this_page_offset;
+            let chunk_size = min(bytes.len(), this_page_remaining);
+            self.eeprom.page_write(offset, &bytes[..chunk_size])?;
+            offset += chunk_size as u32;
+            bytes = &bytes[chunk_size..];
+            self.count_down.start(Duration::from_millis(5));
         }
         Ok(())
     }

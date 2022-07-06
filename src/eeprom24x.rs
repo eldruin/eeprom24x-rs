@@ -1,7 +1,7 @@
 use crate::{
-    addr_size, page_size,
-    polling::{self, NoPolling, Polling},
-    private, Eeprom24x, Error, SlaveAddr,
+    addr_size, page_size, private, Eeprom24x, Error,
+    PollingSupport::{self, NoPolling, Polling},
+    SlaveAddr,
 };
 use core::marker::PhantomData;
 use embedded_hal::blocking::i2c::{Write, WriteRead};
@@ -27,18 +27,6 @@ impl MultiSizeAddr for addr_size::TwoBytes {
         payload[0] = (address >> 8) as u8;
         payload[1] = address as u8;
     }
-}
-
-pub trait HasPollingSupport {
-    const SUPPORT: bool;
-}
-
-impl HasPollingSupport for polling::Polling {
-    const SUPPORT: bool = true;
-}
-
-impl HasPollingSupport for polling::NoPolling {
-    const SUPPORT: bool = false;
 }
 
 /// Common methods
@@ -140,7 +128,7 @@ where
             i2c,
             address,
             address_bits: 4,
-            polling: false,
+            polling: NoPolling,
             _ps: PhantomData,
             _as: PhantomData,
         }
@@ -158,7 +146,7 @@ macro_rules! impl_create {
     (@gen [$create:ident, $address_bits:expr, $doc:expr, $HPS:ident] ) => {
         #[doc = $doc]
         pub fn $create(i2c: I2C, address: SlaveAddr) -> Self {
-            Self::new(i2c, address, $address_bits, $HPS::SUPPORT)
+            Self::new(i2c, address, $address_bits, $HPS)
         }
     };
 }
@@ -187,7 +175,7 @@ macro_rules! impl_for_page_size {
             )*
 
             #[doc = $doc_new]
-            fn new(i2c: I2C, address: SlaveAddr, address_bits: u8, polling_support: bool) -> Self {
+            fn new(i2c: I2C, address: SlaveAddr, address_bits: u8, polling_support: PollingSupport) -> Self {
                 Eeprom24x {
                     i2c,
                     address,
