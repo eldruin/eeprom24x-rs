@@ -39,6 +39,49 @@ impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {
     }
 }
 
+impl<I2C, E, PS, AS, CD> Storage<I2C, PS, AS, CD>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+    AS: MultiSizeAddr,
+    CD: CountDown<Time = Duration>,
+{
+    fn wait(&mut self) -> Result<(), Error<E>> {
+        if let crate::PollingSupport::Polling = self.eeprom.polling {
+            // start polling
+            repeat_timeout!(
+                &mut self.count_down,
+                {
+                    match self.eeprom.read_byte(0){
+                        // ready (ACK)
+                        Ok(_) => {
+                            Ok(())
+                        }
+
+                        // not yet ready (NACK)
+                        Err(Error::I2C(_)) => {Err(())}
+
+                        // any other error
+                        Err(e) => {
+                            return  Err(e);
+                        }
+                    }
+                },
+                (_ack) {
+                    // eeprom done writing => Leaving
+                    break;
+                };
+                (_nack) {
+                    // eeprom still busy
+                    continue;
+                };
+            );
+        } else {
+            let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+        }
+        Ok(())
+    }
+}
+
 impl<I2C, E, PS, AS, CD> embedded_storage::ReadStorage for Storage<I2C, PS, AS, CD>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
@@ -48,7 +91,7 @@ where
     type Error = Error<E>;
 
     fn read(&mut self, offset: u32, bytes: &mut [u8]) -> Result<(), Self::Error> {
-        let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+        self.wait()?;
         self.count_down.start(Duration::from_millis(0));
         self.eeprom.read_data(offset, bytes)
     }
@@ -71,38 +114,7 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            if let crate::PollingSupport::Polling = self.eeprom.polling {
-                // start polling
-                repeat_timeout!(
-                    &mut self.count_down,
-                    {
-                        match self.eeprom.read_byte(0){
-                            // ready (ACK)
-                            Ok(_) => {
-                                Ok(())
-                            }
-
-                            // not yet ready (NACK)
-                            Err(Error::I2C(_)) => {Err(())}
-
-                            // any other error
-                            Err(e) => {
-                                return  Err(e);
-                            }
-                        }
-                    },
-                    (_ack) {
-                        // eeprom done writing => Leaving
-                        break;
-                    };
-                    (_nack) {
-                        // eeprom still busy
-                        continue;
-                    };
-                );
-            } else {
-                let _ = nb::block!(self.count_down.wait());
-            }
+            self.wait()?;
 
             let this_page_offset = offset as usize % page_size;
             let this_page_remaining = page_size - this_page_offset;
