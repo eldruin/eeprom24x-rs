@@ -8,7 +8,6 @@ use embedded_hal::{
     timer::CountDown,
 };
 use embedded_storage::ReadStorage;
-use embedded_timeout_macros::repeat_timeout;
 
 /// Common methods
 impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {}
@@ -46,39 +45,21 @@ where
     CD: CountDown<Time = Duration>,
 {
     fn wait(&mut self) -> Result<(), Error<E>> {
-        if let crate::PollingSupport::Polling = self.eeprom.polling {
-            // start polling
-            repeat_timeout!(
-                &mut self.count_down,
-                {
-                    match self.eeprom.read_byte(0){
-                        // ready (ACK)
-                        Ok(_) => {
-                            Ok(())
-                        }
-
-                        // not yet ready (NACK)
-                        Err(Error::I2C(_)) => {Err(())}
-
-                        // any other error
-                        Err(e) => {
-                            return  Err(e);
+        loop {
+            match self.count_down.wait() {
+                Err(nb::Error::WouldBlock) => {
+                    if let crate::PollingSupport::Polling = self.eeprom.polling {
+                        match self.eeprom.read_byte(0) {
+                            Ok(_) => break Ok(()),   // done
+                            Err(Error::I2C(_)) => {} // not ready, repeat
+                            Err(e) => break Err(e),
                         }
                     }
-                },
-                (_ack) {
-                    // eeprom done writing => Leaving
-                    break;
-                };
-                (_nack) {
-                    // eeprom still busy
-                    continue;
-                };
-            );
-        } else {
-            let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+                }
+                Ok(_) => break Ok(()),
+                Err(_) => {} // timer never fails, we can ignore this case
+            }
         }
-        Ok(())
     }
 }
 
