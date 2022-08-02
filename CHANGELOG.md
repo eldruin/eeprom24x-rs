@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.6.0] - 2022-07-25
+### Added
+- Add support for polling during write operations
+- Add functions `enable_polling` and `disable_polling`
+
 ## [0.5.0] - 2022-01-20
 ### Added
 - Add support for STM M24C01 and M24C02.

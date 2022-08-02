@@ -36,6 +36,18 @@ impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {
     pub fn destroy(self) -> (I2C, CD) {
         (self.eeprom.destroy(), self.count_down)
     }
+
+    /// disables polling for the eeprom
+    pub fn disable_polling(mut self) {
+        self.eeprom.polling_active = false;
+    }
+
+    /// enables polling for the current eeprom, if the eeprom supports it
+    pub fn enable_polling(mut self) {
+        if let crate::PollingSupport::Polling = self.eeprom.polling {
+            self.eeprom.polling_active = true;
+        }
+    }
 }
 
 impl<I2C, E, PS, AS, CD> Storage<I2C, PS, AS, CD>
@@ -48,7 +60,7 @@ where
         loop {
             match self.count_down.wait() {
                 Err(nb::Error::WouldBlock) => {
-                    if let crate::PollingSupport::Polling = self.eeprom.polling {
+                    if self.eeprom.polling_active {
                         match self.eeprom.read_byte(0) {
                             Ok(_) => break Ok(()),   // done
                             Err(Error::I2C(_)) => {} // not ready, repeat

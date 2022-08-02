@@ -129,6 +129,7 @@ where
             address,
             address_bits: 4,
             polling: NoPolling,
+            polling_active: false,
             _ps: PhantomData,
             _as: PhantomData,
         }
@@ -176,14 +177,27 @@ macro_rules! impl_for_page_size {
 
             #[doc = $doc_new]
             fn new(i2c: I2C, address: SlaveAddr, address_bits: u8, polling_support: PollingSupport) -> Self {
+                if let Polling = polling_support {
                 Eeprom24x {
                     i2c,
                     address,
                     address_bits,
                     polling: polling_support,
+                    polling_active: true,
                     _ps: PhantomData,
                     _as: PhantomData,
                 }
+            }else{
+                Eeprom24x {
+                    i2c,
+                    address,
+                    address_bits,
+                    polling: polling_support,
+                    polling_active: false,
+                    _ps: PhantomData,
+                    _as: PhantomData,
+                }
+            }
             }
         }
 
