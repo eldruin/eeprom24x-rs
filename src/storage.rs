@@ -25,7 +25,7 @@ where
         // Furthermore, we also have to wait for the countdown before reading the eeprom again.
         // Basically, we have to wait before any I2C access and ensure that the countdown is
         // running again afterwards.
-        count_down.start(Duration::from_millis(0));
+        count_down.start(Duration::from_millis(5));
         Storage { eeprom, count_down }
     }
 }
@@ -38,15 +38,20 @@ impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {
     }
 
     /// disables polling for the eeprom
-    pub fn disable_polling(mut self) {
+    pub fn disable_polling(&mut self) {
         self.eeprom.polling_active = false;
     }
 
     /// enables polling for the current eeprom, if the eeprom supports it
-    pub fn enable_polling(mut self) {
+    pub fn enable_polling(&mut self) {
         if let crate::PollingSupport::Polling = self.eeprom.polling {
             self.eeprom.polling_active = true;
-        }
+        };
+    }
+
+    /// returns whether polling is currently active or not
+    pub fn get_polling_status(self) -> bool {
+        self.eeprom.polling_active
     }
 }
 

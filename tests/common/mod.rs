@@ -192,3 +192,26 @@ macro_rules! for_all_writestorage_ics_with_capacity {
         }
     };
 }
+
+#[macro_export]
+macro_rules! for_all_ics_with_polling {
+    ($name:ident) => {
+        mod $name {
+            use super::*;
+            $name!(for_24x01, new_24x01, false);
+            $name!(for_m24x01, new_m24x01, true);
+            $name!(for_24x02, new_24x02, false);
+            $name!(for_m24x02, new_m24x02, true);
+            $name!(for_24x04, new_24x04, false);
+            $name!(for_24x08, new_24x08, false);
+            $name!(for_24x16, new_24x16, false);
+            $name!(for_24x32, new_24x32, false);
+            $name!(for_24x64, new_24x64, false);
+            $name!(for_24x128, new_24x128, false);
+            $name!(for_24x256, new_24x256, false);
+            $name!(for_24x512, new_24x512, false);
+            $name!(for_24xm01, new_24xm01, false);
+            $name!(for_24xm02, new_24xm02, false);
+        }
+    };
+}
