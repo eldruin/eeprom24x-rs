@@ -111,3 +111,38 @@ macro_rules! cannot_write_too_much_data {
     };
 }
 for_all_writestorage_ics_with_capacity!(cannot_write_too_much_data);
+
+macro_rules! enable_polling_support {
+    ($name:ident, $create:ident, $support:expr) => {
+        #[test]
+        fn $name() {
+            let mut storage = storage_new($create(&[]));
+            storage.enable_polling();
+            let polling_status = storage.get_polling_status();
+            if polling_status != $support {
+                panic!(
+                    "polling was set to {}, but expected: {}",
+                    polling_status, $support
+                )
+            }
+        }
+    };
+}
+
+for_all_ics_with_polling!(enable_polling_support);
+
+macro_rules! disable_polling_support {
+    ($name:ident, $create:ident, $support:expr) => {
+        #[test]
+        fn $name() {
+            let mut storage = storage_new($create(&[]));
+            storage.disable_polling();
+            let polling_status = storage.get_polling_status();
+            if polling_status {
+                panic!("polling was set to {}, but expected: false", polling_status)
+            }
+        }
+    };
+}
+
+for_all_ics_with_polling!(disable_polling_support);

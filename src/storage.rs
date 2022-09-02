@@ -25,7 +25,7 @@ where
         // Furthermore, we also have to wait for the countdown before reading the eeprom again.
         // Basically, we have to wait before any I2C access and ensure that the countdown is
         // running again afterwards.
-        count_down.start(Duration::from_millis(0));
+        count_down.start(Duration::from_millis(5));
         Storage { eeprom, count_down }
     }
 }
@@ -35,6 +35,48 @@ impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {
     /// Destroy driver instance, return I²C bus and timer instance.
     pub fn destroy(self) -> (I2C, CD) {
         (self.eeprom.destroy(), self.count_down)
+    }
+
+    /// disables polling for the eeprom
+    pub fn disable_polling(&mut self) {
+        self.eeprom.polling_active = false;
+    }
+
+    /// enables polling for the current eeprom, if the eeprom supports it
+    pub fn enable_polling(&mut self) {
+        if let crate::PollingSupport::Polling = self.eeprom.polling {
+            self.eeprom.polling_active = true;
+        };
+    }
+
+    /// returns whether polling is currently active or not
+    pub fn get_polling_status(self) -> bool {
+        self.eeprom.polling_active
+    }
+}
+
+impl<I2C, E, PS, AS, CD> Storage<I2C, PS, AS, CD>
+where
+    I2C: Write<Error = E> + WriteRead<Error = E>,
+    AS: MultiSizeAddr,
+    CD: CountDown<Time = Duration>,
+{
+    fn wait(&mut self) -> Result<(), Error<E>> {
+        loop {
+            match self.count_down.wait() {
+                Err(nb::Error::WouldBlock) => {
+                    if self.eeprom.polling_active {
+                        match self.eeprom.read_byte(0) {
+                            Ok(_) => break Ok(()),   // done
+                            Err(Error::I2C(_)) => {} // not ready, repeat
+                            Err(e) => break Err(e),
+                        }
+                    }
+                }
+                Ok(_) => break Ok(()),
+                Err(_) => {} // timer never fails, we can ignore this case
+            }
+        }
     }
 }
 
@@ -47,7 +89,7 @@ where
     type Error = Error<E>;
 
     fn read(&mut self, offset: u32, bytes: &mut [u8]) -> Result<(), Self::Error> {
-        let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+        self.wait()?;
         self.count_down.start(Duration::from_millis(0));
         self.eeprom.read_data(offset, bytes)
     }
@@ -70,19 +112,14 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
+            self.wait()?;
+
             let this_page_offset = offset as usize % page_size;
             let this_page_remaining = page_size - this_page_offset;
             let chunk_size = min(bytes.len(), this_page_remaining);
             self.eeprom.page_write(offset, &bytes[..chunk_size])?;
             offset += chunk_size as u32;
             bytes = &bytes[chunk_size..];
-            // TODO At least ST's eeproms allow polling, i.e. trying the next i2c access which will
-            // just be NACKed as long as the device is still busy. This could potentially speed up
-            // the write process.
-            // TODO Currently outdated comment:
-            // A (theoretically needless) delay after the last page write ensures that the user can
-            // call Storage::write() again immediately.
             self.count_down.start(Duration::from_millis(5));
         }
         Ok(())
