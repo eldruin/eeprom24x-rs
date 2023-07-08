@@ -242,15 +242,20 @@ pub struct Storage<I2C, PS, AS, CD> {
     count_down: CD,
 }
 
-mod private {
+/// Module containing the Sealed trait
+pub mod sealed {
     use crate::addr_size;
 
+    /// Sealed trait for specifying address size
     pub trait Sealed {}
 
+    /// Sealed trait implementation for OneByte addresses
     impl Sealed for addr_size::OneByte {}
+    /// Sealed trait implementation for TwoByte addresses
     impl Sealed for addr_size::TwoBytes {}
 }
 
-mod eeprom24x;
+/// Module containing device-specifying traits
+pub mod eeprom24x;
 mod slave_addr;
 mod storage;
