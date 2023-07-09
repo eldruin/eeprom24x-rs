@@ -18,17 +18,16 @@ include = [
     "/LICENSE-MIT",
     "/LICENSE-APACHE",
 ]
-edition = "2018"
-resolver = "2"
+edition = "2021"
 
 [dependencies]
-embedded-hal = "0.2"
-embedded-storage = "0.2.0"
-nb = "1.0.0"
+embedded-hal = "0.2.7"
+embedded-storage = "0.3.0"
+nb = "1.1"
 
 [dev-dependencies]
 linux-embedded-hal = "0.3"
-embedded-hal-mock = "0.8"
+embedded-hal-mock = "0.9"
 void = { version = "1.0.2", default-features = false }
 
 [profile.release]

@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Trait `Eeprom24xTrait` providing the device interface.
 
+### Changed
+- Updated `embedded-storage` dependency to version 0.3.
+- Updated `nb` dependency to version 1.1.
+- Increase MSRV to version 1.60.0.
+
 ## [0.5.0] - 2022-01-20
 ### Added
 - Add support for STM M24C01 and M24C02.
