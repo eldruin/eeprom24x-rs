@@ -1,7 +1,6 @@
 use crate::{addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
 use core::marker::PhantomData;
 use embedded_hal::blocking::i2c::{Write, WriteRead};
-
 pub trait MultiSizeAddr: private::Sealed {
     const ADDRESS_BYTES: usize;
 
@@ -242,11 +241,50 @@ macro_rules! impl_for_page_size {
             }
         }
 
+        impl<I2C, E, AS> crate::Eeprom24xTrait for Eeprom24x<I2C, page_size::$PS, AS>
+        where
+            I2C: Write<Error = E> + WriteRead<Error=E> + embedded_hal::blocking::i2c::Read<Error = E>,
+            AS: MultiSizeAddr
+            {
+                type Error = E;
+
+                fn write_byte(&mut self, address: u32, data: u8) -> Result<(), Error<Self::Error>>
+                {
+                    self.write_byte(address, data)
+                }
+
+                fn read_byte(&mut self, address: u32) -> Result<u8, Error<Self::Error>>
+                {
+                    self.read_byte(address)
+                }
+
+                fn read_data(&mut self, address: u32, data: &mut [u8]) -> Result<(), Error<Self::Error>>
+                {
+                    self.read_data(address, data)
+                }
+
+                fn read_current_address(&mut self) -> Result<u8, Error<Self::Error>>
+                {
+                    self.read_current_address()
+                }
+
+                fn write_page(&mut self, address: u32, data: &[u8]) -> Result<(), Error<Self::Error>>
+                {
+                    self.write_page(address, &data)
+                }
+
+                fn page_size(&self) -> usize
+                {
+                    $page_size
+                }
+            }
     };
 }
 
 /// Helper trait which gives the Storage implementation access to the `write_page` method and
 /// information about the page size
+///
+/// TODO: Replace this with `Eeprom24xTrait` once migrated to embedded-hal 1.0
 pub trait PageWrite<E> {
     fn page_write(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>>;
     fn page_size(&self) -> usize;

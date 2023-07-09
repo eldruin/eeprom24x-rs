@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Trait `Eeprom24xTrait` providing the device interface.
+
 ## [0.5.0] - 2022-01-20
 ### Added
 - Add support for STM M24C01 and M24C02.

@@ -9,12 +9,14 @@
 //! - Read the current memory address (please read notes). See: [`read_current_address()`].
 //! - Write a byte to a memory address. See: [`write_byte()`].
 //! - Write a byte array (up to a memory page) to a memory address. See: [`write_page()`].
+//! - Use the device in generic code via the [`Eeprom24xTrait`].
 //!
 //! [`read_byte()`]: Eeprom24x::read_byte
 //! [`read_data()`]: Eeprom24x::read_data
 //! [`read_current_address()`]: Eeprom24x::read_current_address
 //! [`write_byte()`]: Eeprom24x::write_byte
 //! [`write_page()`]: Eeprom24x::write_page
+//! [`Eeprom24xTrait`]: Eeprom24xTrait
 //!
 //! If an `embedded_hal::timer::CountDown` is available, the [`embedded-storage`] traits can
 //! additionally be used which allow to read the device capacity and write over page boundaries. To
@@ -232,6 +234,47 @@ pub struct Eeprom24x<I2C, PS, AS> {
     _as: PhantomData<AS>,
 }
 
+/// `Eeprom24x` type trait for use in generic code
+pub trait Eeprom24xTrait: private::Sealed {
+    /// Inner implementation error.
+    type Error;
+
+    /// Write a single byte in an address.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    fn write_byte(&mut self, address: u32, data: u8) -> Result<(), Error<Self::Error>>;
+
+    /// Read a single byte from an address.
+    fn read_byte(&mut self, address: u32) -> Result<u8, Error<Self::Error>>;
+
+    /// Read starting in an address as many bytes as necessary to fill the data array provided.
+    fn read_data(&mut self, address: u32, data: &mut [u8]) -> Result<(), Error<Self::Error>>;
+
+    /// Read the contents of the last address accessed during the last read
+    /// or write operation, _incremented by one_.
+    ///
+    /// Note: This may not be available on your platform.
+    fn read_current_address(&mut self) -> Result<u8, Error<Self::Error>>;
+
+    /// Write up to a page starting in an address.
+    ///
+    /// The maximum amount of data that can be written depends on the page
+    /// size of the device and its overall capacity. If too much data is passed,
+    /// the error `Error::TooMuchData` will be returned.
+    ///
+    /// After writing a byte, the EEPROM enters an internally-timed write cycle
+    /// to the nonvolatile memory.
+    /// During this time all inputs are disabled and the EEPROM will not
+    /// respond until the write is complete.
+    fn write_page(&mut self, address: u32, data: &[u8]) -> Result<(), Error<Self::Error>>;
+
+    /// Return device page size
+    fn page_size(&self) -> usize;
+}
+
 /// EEPROM24X extension which supports the `embedded-storage` traits but requires an
 /// `embedded_hal::timer::CountDown` to handle the timeouts when writing over page boundaries
 #[derive(Debug)]
@@ -243,12 +286,13 @@ pub struct Storage<I2C, PS, AS, CD> {
 }
 
 mod private {
-    use crate::addr_size;
+    use crate::{addr_size, Eeprom24x};
 
     pub trait Sealed {}
 
     impl Sealed for addr_size::OneByte {}
     impl Sealed for addr_size::TwoBytes {}
+    impl<I2C, PS, AS> Sealed for Eeprom24x<I2C, PS, AS> {}
 }
 
 mod eeprom24x;

@@ -1,4 +1,6 @@
-use eeprom24x::Error;
+use std::fmt::Debug;
+
+use eeprom24x::{Eeprom24xTrait, Error};
 use embedded_hal_mock::i2c::Transaction as I2cTrans;
 mod common;
 use crate::common::{
@@ -247,5 +249,17 @@ fn can_use_device_address_for_memory_addressing_2bytes() {
     let trans = [I2cTrans::write(DEV_ADDR | 0x3, vec![0xBC, 0xDE, 0xAB])];
     let mut eeprom = new_24xm02(&trans);
     eeprom.write_byte(0x3BCDE, 0xAB).unwrap();
+    destroy(eeprom);
+}
+
+fn write_byte<E: Debug>(eeprom: &mut impl Eeprom24xTrait<Error = E>) {
+    eeprom.write_byte(0x7BC, 0xAB).unwrap();
+}
+
+#[test]
+fn can_pass_device_to_function() {
+    let trans = [I2cTrans::write(DEV_ADDR | 0x7, vec![0xBC, 0xAB])];
+    let mut eeprom = new_24x16(&trans);
+    write_byte(&mut eeprom);
     destroy(eeprom);
 }
