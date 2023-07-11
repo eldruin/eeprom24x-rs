@@ -1,9 +1,13 @@
-use crate::{addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
+use crate::{addr_size, page_size, sealed, Eeprom24x, Error, SlaveAddr};
 use core::marker::PhantomData;
 use embedded_hal::blocking::i2c::{Write, WriteRead};
-pub trait MultiSizeAddr: private::Sealed {
+
+/// Trait for filling in addresses of one or more bytes
+pub trait MultiSizeAddr: sealed::Sealed {
+    /// Specifies the size of the address
     const ADDRESS_BYTES: usize;
 
+    /// Fill in addresses of one or more bytes
     fn fill_address(address: u32, payload: &mut [u8]);
 }
 
@@ -286,7 +290,10 @@ macro_rules! impl_for_page_size {
 ///
 /// TODO: Replace this with `Eeprom24xTrait` once migrated to embedded-hal 1.0
 pub trait PageWrite<E> {
+    /// Write a page of data into the specified address
     fn page_write(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>>;
+
+    /// Report the size of a page
     fn page_size(&self) -> usize;
 }
 

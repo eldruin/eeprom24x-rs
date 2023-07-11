@@ -235,7 +235,7 @@ pub struct Eeprom24x<I2C, PS, AS> {
 }
 
 /// `Eeprom24x` type trait for use in generic code
-pub trait Eeprom24xTrait: private::Sealed {
+pub trait Eeprom24xTrait: sealed::Sealed {
     /// Inner implementation error.
     type Error;
 
@@ -285,16 +285,21 @@ pub struct Storage<I2C, PS, AS, CD> {
     count_down: CD,
 }
 
-mod private {
+/// Module containing the Sealed trait
+pub mod sealed {
     use crate::{addr_size, Eeprom24x};
 
+    /// Sealed trait for specifying address size
     pub trait Sealed {}
 
+    /// Sealed trait implementation for OneByte addresses
     impl Sealed for addr_size::OneByte {}
+    /// Sealed trait implementation for TwoByte addresses
     impl Sealed for addr_size::TwoBytes {}
     impl<I2C, PS, AS> Sealed for Eeprom24x<I2C, PS, AS> {}
 }
 
-mod eeprom24x;
+/// Module containing device-specifying traits
+pub mod eeprom24x;
 mod slave_addr;
 mod storage;
