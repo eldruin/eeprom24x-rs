@@ -35,8 +35,8 @@ applications where low power and low voltage operation are essential.
 |  24x00 |    128 bits |          16 |       N/A | [24C00]    |
 |  24x01 |      1 Kbit |         128 |   8 bytes | [AT24C01]  |
 | M24x01 |      1 Kbit |         128 |  16 bytes | [M24C01]   |
-|  24x02 |      2 Kbit |         256 |   8 bytes | [M24C02]   |
-| M24x02 |      2 Kbit |         256 |  16 bytes | [AT24C02]  |
+|  24x02 |      2 Kbit |         256 |   8 bytes | [AT24C02]  |
+| M24x02 |      2 Kbit |         256 |  16 bytes | [M24C02]   |
 |  24x04 |      4 Kbit |         512 |  16 bytes | [AT24C04]  |
 |  24x08 |      8 Kbit |       1,024 |  16 bytes | [AT24C08]  |
 |  24x16 |     16 Kbit |       2,048 |  16 bytes | [AT24C16]  |
