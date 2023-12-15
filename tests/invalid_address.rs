@@ -1,7 +1,8 @@
 use eeprom24x::Error;
 mod common;
 use crate::common::{
-    destroy, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x128, new_24x16,
+    destroy, new_24csx01, new_24csx02, new_24csx04, new_24csx08, new_24csx16, new_24csx32,
+    new_24csx64, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x128, new_24x16,
     new_24x256, new_24x32, new_24x512, new_24x64, new_24xm01, new_24xm02, new_m24x01, new_m24x02,
 };
 

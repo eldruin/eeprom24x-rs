@@ -1,4 +1,4 @@
-use crate::{addr_size, page_size, private, Eeprom24x, Error, SlaveAddr};
+use crate::{addr_size, page_size, private, unique_serial, Eeprom24x, Error, SlaveAddr};
 use core::marker::PhantomData;
 use embedded_hal::blocking::i2c::{Write, WriteRead};
 pub trait MultiSizeAddr: private::Sealed {
@@ -25,14 +25,14 @@ impl MultiSizeAddr for addr_size::TwoBytes {
 }
 
 /// Common methods
-impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS> {
+impl<I2C, PS, AS, SN> Eeprom24x<I2C, PS, AS, SN> {
     /// Destroy driver instance, return I²C bus instance.
     pub fn destroy(self) -> I2C {
         self.i2c
     }
 }
 
-impl<I2C, PS, AS> Eeprom24x<I2C, PS, AS>
+impl<I2C, PS, AS, SN> Eeprom24x<I2C, PS, AS, SN>
 where
     AS: MultiSizeAddr,
 {
@@ -50,7 +50,7 @@ where
 }
 
 /// Common methods
-impl<I2C, E, PS, AS> Eeprom24x<I2C, PS, AS>
+impl<I2C, E, PS, AS, SN> Eeprom24x<I2C, PS, AS, SN>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
     AS: MultiSizeAddr,
@@ -95,7 +95,7 @@ where
 }
 
 /// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
-impl<I2C, E, PS, AS> Eeprom24x<I2C, PS, AS>
+impl<I2C, E, PS, AS, SN> Eeprom24x<I2C, PS, AS, SN>
 where
     I2C: embedded_hal::blocking::i2c::Read<Error = E>,
 {
@@ -113,7 +113,7 @@ where
 }
 
 /// Specialization for devices without page access (e.g. 24C00)
-impl<I2C, E> Eeprom24x<I2C, page_size::No, addr_size::OneByte>
+impl<I2C, E> Eeprom24x<I2C, page_size::No, addr_size::OneByte, unique_serial::No>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
@@ -125,6 +125,7 @@ where
             address_bits: 4,
             _ps: PhantomData,
             _as: PhantomData,
+            _sn: PhantomData,
         }
     }
 }
@@ -148,26 +149,32 @@ macro_rules! impl_create {
 // This macro could be simplified once https://github.com/rust-lang/rust/issues/42863 is fixed.
 macro_rules! impl_for_page_size {
     ( $AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr,
-        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident ] ),* ) => {
+        $( [ $dev:expr, $part:expr, $address_bits:expr, $SN:ident, $create:ident ] ),* ) => {
         impl_for_page_size!{
             @gen [$AS, $addr_bytes, $PS, $page_size,
             concat!("Specialization for devices with a page size of ", stringify!($page_size), " bytes."),
             concat!("Create generic instance for devices with a page size of ", stringify!($page_size), " bytes."),
-            $( [ $dev, $part, $address_bits, $create ] ),* ]
+            $( [ $dev, $part, $address_bits, $SN, $create ] ),* ]
         }
     };
 
     (@gen [$AS:ident, $addr_bytes:expr, $PS:ident, $page_size:expr, $doc_impl:expr, $doc_new:expr,
-        $( [ $dev:expr, $part:expr, $address_bits:expr, $create:ident ] ),* ] ) => {
-        #[doc = $doc_impl]
-        impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::$AS>
-        where
-            I2C: Write<Error = E>
-        {
+        $( [ $dev:expr, $part:expr, $address_bits:expr, $SN:ident, $create:ident ] ),* ] ) => {
+
             $(
+            impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::$AS, unique_serial::$SN>
+            where
+                I2C: Write<Error = E>
+            {
                 impl_create!($dev, $part, $address_bits, $create);
+            }
             )*
 
+            #[doc = $doc_impl]
+            impl<I2C, E, SN> Eeprom24x<I2C, page_size::$PS, addr_size::$AS, SN>
+            where
+                I2C: Write<Error = E>
+            {
             #[doc = $doc_new]
             fn new(i2c: I2C, address: SlaveAddr, address_bits: u8) -> Self {
                 Eeprom24x {
@@ -176,11 +183,12 @@ macro_rules! impl_for_page_size {
                     address_bits,
                     _ps: PhantomData,
                     _as: PhantomData,
+                    _sn: PhantomData,
                 }
             }
         }
 
-        impl<I2C, E, AS> Eeprom24x<I2C, page_size::$PS, AS>
+        impl<I2C, E, AS, SN> Eeprom24x<I2C, page_size::$PS, AS, SN>
         where
             I2C: Write<Error = E>,
             AS: MultiSizeAddr,
@@ -227,7 +235,7 @@ macro_rules! impl_for_page_size {
             }
         }
 
-        impl<I2C, E, AS> PageWrite<E> for Eeprom24x<I2C, page_size::$PS, AS>
+        impl<I2C, E, AS, SN> PageWrite<E> for Eeprom24x<I2C, page_size::$PS, AS, SN>
         where
             I2C: Write<Error = E>,
             AS: MultiSizeAddr,
@@ -241,7 +249,7 @@ macro_rules! impl_for_page_size {
             }
         }
 
-        impl<I2C, E, AS> crate::Eeprom24xTrait for Eeprom24x<I2C, page_size::$PS, AS>
+        impl<I2C, E, AS, SN> crate::Eeprom24xTrait for Eeprom24x<I2C, page_size::$PS, AS, SN>
         where
             I2C: Write<Error = E> + WriteRead<Error=E> + embedded_hal::blocking::i2c::Read<Error = E>,
             AS: MultiSizeAddr
@@ -295,48 +303,55 @@ impl_for_page_size!(
     1,
     B8,
     8,
-    ["24x01", "AT24C01", 7, new_24x01],
-    ["24x02", "AT24C02", 8, new_24x02]
+    ["24x01", "AT24C01", 7, No, new_24x01],
+    ["24x02", "AT24C02", 8, No, new_24x02],
+    ["24CSx01", "24CS01", 7, Yes, new_24csx01],
+    ["24CSx02", "24CS02", 8, Yes, new_24csx02]
 );
 impl_for_page_size!(
     OneByte,
     1,
     B16,
     16,
-    ["24x04", "AT24C04", 9, new_24x04],
-    ["24x08", "AT24C08", 10, new_24x08],
-    ["24x16", "AT24C16", 11, new_24x16],
-    ["M24C01", "M24C01", 7, new_m24x01],
-    ["M24C02", "M24C02", 8, new_m24x02]
+    ["24x04", "AT24C04", 9, No, new_24x04],
+    ["24x08", "AT24C08", 10, No, new_24x08],
+    ["24x16", "AT24C16", 11, No, new_24x16],
+    ["24CSx04", "AT24CS04", 9, Yes, new_24csx04],
+    ["24CSx08", "AT24CS08", 10, Yes, new_24csx08],
+    ["24CSx16", "AT24CS16", 11, Yes, new_24csx16],
+    ["M24C01", "M24C01", 7, No, new_m24x01],
+    ["M24C02", "M24C02", 8, No, new_m24x02]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B32,
     32,
-    ["24x32", "AT24C32", 12, new_24x32],
-    ["24x64", "AT24C64", 13, new_24x64]
+    ["24x32", "AT24C32", 12, No, new_24x32],
+    ["24x64", "AT24C64", 13, No, new_24x64],
+    ["24CSx32", "AT24CS32", 12, Yes, new_24csx32],
+    ["24CSx64", "AT24CS64", 13, Yes, new_24csx64]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B64,
     64,
-    ["24x128", "AT24C128", 14, new_24x128],
-    ["24x256", "AT24C256", 15, new_24x256]
+    ["24x128", "AT24C128", 14, No, new_24x128],
+    ["24x256", "AT24C256", 15, No, new_24x256]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B128,
     128,
-    ["24x512", "AT24C512", 16, new_24x512]
+    ["24x512", "AT24C512", 16, No, new_24x512]
 );
 impl_for_page_size!(
     TwoBytes,
     2,
     B256,
     256,
-    ["24xM01", "AT24CM01", 17, new_24xm01],
-    ["24xM02", "AT24CM02", 18, new_24xm02]
+    ["24xM01", "AT24CM01", 17, No, new_24xm01],
+    ["24xM02", "AT24CM02", 18, No, new_24xm02]
 );

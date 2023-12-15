@@ -17,6 +17,7 @@ This driver allows you to:
 - Read the current memory address (please read notes). See: `read_current_address()`.
 - Write a byte to a memory address. See: `write_byte()`.
 - Write a byte array (up to a memory page) to a memory address. See: `write_page()`.
+- Read `CSx`-variant devices' factory-programmed unique serial. See: `read_unique_serial()`.
 - Use the device in generic code via the `Eeprom24xTrait`.
 
 Can be used at least with the devices listed below.
