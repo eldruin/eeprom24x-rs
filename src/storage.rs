@@ -10,15 +10,15 @@ use embedded_hal::{
 use embedded_storage::ReadStorage;
 
 /// Common methods
-impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {}
+impl<I2C, PS, AS, SN, CD> Storage<I2C, PS, AS, SN, CD> {}
 
 /// Common methods
-impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD>
+impl<I2C, PS, AS, SN, CD> Storage<I2C, PS, AS, SN, CD>
 where
     CD: CountDown<Time = Duration>,
 {
     /// Create a new Storage instance wrapping the given Eeprom
-    pub fn new(eeprom: Eeprom24x<I2C, PS, AS>, mut count_down: CD) -> Self {
+    pub fn new(eeprom: Eeprom24x<I2C, PS, AS, SN>, mut count_down: CD) -> Self {
         // When writing to the eeprom, we start a countdown of 5 ms after each page and wait for
         // the timer before writing to the next page. Therefore, we always need a valid countdown
         // so we start it here without any delay.
@@ -31,14 +31,14 @@ where
 }
 
 /// Common methods
-impl<I2C, PS, AS, CD> Storage<I2C, PS, AS, CD> {
+impl<I2C, PS, AS, SN, CD> Storage<I2C, PS, AS, SN, CD> {
     /// Destroy driver instance, return I²C bus and timer instance.
     pub fn destroy(self) -> (I2C, CD) {
         (self.eeprom.destroy(), self.count_down)
     }
 }
 
-impl<I2C, E, PS, AS, CD> embedded_storage::ReadStorage for Storage<I2C, PS, AS, CD>
+impl<I2C, E, PS, AS, SN, CD> embedded_storage::ReadStorage for Storage<I2C, PS, AS, SN, CD>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
     AS: MultiSizeAddr,
@@ -57,11 +57,11 @@ where
     }
 }
 
-impl<I2C, E, PS, AS, CD> embedded_storage::Storage for Storage<I2C, PS, AS, CD>
+impl<I2C, E, PS, AS, SN, CD> embedded_storage::Storage for Storage<I2C, PS, AS, SN, CD>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
     AS: MultiSizeAddr,
-    Eeprom24x<I2C, PS, AS>: PageWrite<E>,
+    Eeprom24x<I2C, PS, AS, SN>: PageWrite<E>,
     CD: CountDown<Time = Duration>,
 {
     fn write(&mut self, mut offset: u32, mut bytes: &[u8]) -> Result<(), Self::Error> {

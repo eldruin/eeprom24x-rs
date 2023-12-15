@@ -3,7 +3,8 @@ use embedded_hal_mock::i2c::{Mock as I2cMock, Transaction as I2cTrans};
 use embedded_storage::{ReadStorage, Storage as _};
 mod common;
 use crate::common::{
-    destroy, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x128, new_24x16,
+    destroy, new_24csx01, new_24csx02, new_24csx04, new_24csx08, new_24csx16, new_24csx32,
+    new_24csx64, new_24x00, new_24x01, new_24x02, new_24x04, new_24x08, new_24x128, new_24x16,
     new_24x256, new_24x32, new_24x512, new_24x64, new_24xm01, new_24xm02, new_m24x01, new_m24x02,
     DEV_ADDR,
 };
@@ -22,9 +23,9 @@ impl embedded_hal::timer::CountDown for MockCountDown {
     }
 }
 
-fn storage_new<PS, AS>(
-    eeprom: Eeprom24x<I2cMock, PS, AS>,
-) -> Storage<I2cMock, PS, AS, MockCountDown> {
+fn storage_new<PS, AS, SN>(
+    eeprom: Eeprom24x<I2cMock, PS, AS, SN>,
+) -> Storage<I2cMock, PS, AS, SN, MockCountDown> {
     Storage::new(eeprom, MockCountDown)
 }
 

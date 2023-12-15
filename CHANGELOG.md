@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Add support for 24CSx devices.
+- Implement `read_unique_serial` for 24CSx devices.
 
 ## [0.6.0] - 2023-07-10
 

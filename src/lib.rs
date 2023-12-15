@@ -9,6 +9,7 @@
 //! - Read the current memory address (please read notes). See: [`read_current_address()`].
 //! - Write a byte to a memory address. See: [`write_byte()`].
 //! - Write a byte array (up to a memory page) to a memory address. See: [`write_page()`].
+//! - Read `CSx`-variant devices' factory-programmed unique serial. See: [`read_unique_serial()`].
 //! - Use the device in generic code via the [`Eeprom24xTrait`].
 //!
 //! [`read_byte()`]: Eeprom24x::read_byte
@@ -16,6 +17,7 @@
 //! [`read_current_address()`]: Eeprom24x::read_current_address
 //! [`write_byte()`]: Eeprom24x::write_byte
 //! [`write_page()`]: Eeprom24x::write_page
+//! [`read_unique_serial()`]: Eeprom24x::read_unique_serial
 //! [`Eeprom24xTrait`]: Eeprom24xTrait
 //!
 //! If an `embedded_hal::timer::CountDown` is available, the [`embedded-storage`] traits can
@@ -219,9 +221,17 @@ pub mod page_size {
     pub struct B256(());
 }
 
+/// Factory-supplied unique serial number markers
+pub mod unique_serial {
+    /// Contains a factory-supplied unique serial number. e.g. for AT24CSx
+    pub struct Yes(());
+    /// No factory-supplied unique serial number
+    pub struct No(());
+}
+
 /// EEPROM24X driver
 #[derive(Debug)]
-pub struct Eeprom24x<I2C, PS, AS> {
+pub struct Eeprom24x<I2C, PS, AS, SN> {
     /// The concrete I²C device implementation.
     i2c: I2C,
     /// The I²C device address.
@@ -232,6 +242,8 @@ pub struct Eeprom24x<I2C, PS, AS> {
     _ps: PhantomData<PS>,
     /// Address size marker type.
     _as: PhantomData<AS>,
+    /// Unique serial number marker type.
+    _sn: PhantomData<SN>,
 }
 
 /// `Eeprom24x` type trait for use in generic code
@@ -278,9 +290,9 @@ pub trait Eeprom24xTrait: private::Sealed {
 /// EEPROM24X extension which supports the `embedded-storage` traits but requires an
 /// `embedded_hal::timer::CountDown` to handle the timeouts when writing over page boundaries
 #[derive(Debug)]
-pub struct Storage<I2C, PS, AS, CD> {
+pub struct Storage<I2C, PS, AS, SN, CD> {
     /// Eeprom driver over which we implement the Storage traits
-    pub eeprom: Eeprom24x<I2C, PS, AS>,
+    pub eeprom: Eeprom24x<I2C, PS, AS, SN>,
     /// CountDown timer
     count_down: CD,
 }
@@ -292,9 +304,10 @@ mod private {
 
     impl Sealed for addr_size::OneByte {}
     impl Sealed for addr_size::TwoBytes {}
-    impl<I2C, PS, AS> Sealed for Eeprom24x<I2C, PS, AS> {}
+    impl<I2C, PS, AS, SN> Sealed for Eeprom24x<I2C, PS, AS, SN> {}
 }
 
 mod eeprom24x;
+mod serial_number;
 mod slave_addr;
 mod storage;
