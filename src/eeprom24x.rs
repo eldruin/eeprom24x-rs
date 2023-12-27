@@ -1,6 +1,6 @@
 use crate::{addr_size, page_size, private, unique_serial, Eeprom24x, Error, SlaveAddr};
 use core::marker::PhantomData;
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::I2c;
 pub trait MultiSizeAddr: private::Sealed {
     const ADDRESS_BYTES: usize;
 
@@ -52,7 +52,7 @@ where
 /// Common methods
 impl<I2C, E, PS, AS, SN> Eeprom24x<I2C, PS, AS, SN>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c<Error = E>,
     AS: MultiSizeAddr,
 {
     /// Write a single byte in an address.
@@ -97,7 +97,7 @@ where
 /// Specialization for platforms which implement `embedded_hal::blocking::i2c::Read`
 impl<I2C, E, PS, AS, SN> Eeprom24x<I2C, PS, AS, SN>
 where
-    I2C: embedded_hal::blocking::i2c::Read<Error = E>,
+    I2C: I2c<Error = E>,
 {
     /// Read the contents of the last address accessed during the last read
     /// or write operation, _incremented by one_.
@@ -115,7 +115,7 @@ where
 /// Specialization for devices without page access (e.g. 24C00)
 impl<I2C, E> Eeprom24x<I2C, page_size::No, addr_size::OneByte, unique_serial::No>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c<Error = E>,
 {
     /// Create a new instance of a 24x00 device (e.g. 24C00)
     pub fn new_24x00(i2c: I2C, address: SlaveAddr) -> Self {
@@ -164,7 +164,7 @@ macro_rules! impl_for_page_size {
             $(
             impl<I2C, E> Eeprom24x<I2C, page_size::$PS, addr_size::$AS, unique_serial::$SN>
             where
-                I2C: Write<Error = E>
+                I2C: I2c<Error = E>
             {
                 impl_create!($dev, $part, $address_bits, $create);
             }
@@ -173,7 +173,7 @@ macro_rules! impl_for_page_size {
             #[doc = $doc_impl]
             impl<I2C, E, SN> Eeprom24x<I2C, page_size::$PS, addr_size::$AS, SN>
             where
-                I2C: Write<Error = E>
+                I2C: I2c<Error = E>
             {
             #[doc = $doc_new]
             fn new(i2c: I2C, address: SlaveAddr, address_bits: u8) -> Self {
@@ -190,7 +190,7 @@ macro_rules! impl_for_page_size {
 
         impl<I2C, E, AS, SN> Eeprom24x<I2C, page_size::$PS, AS, SN>
         where
-            I2C: Write<Error = E>,
+            I2C: I2c<Error = E>,
             AS: MultiSizeAddr,
         {
             /// Write up to a page starting in an address.
@@ -237,7 +237,7 @@ macro_rules! impl_for_page_size {
 
         impl<I2C, E, AS, SN> PageWrite<E> for Eeprom24x<I2C, page_size::$PS, AS, SN>
         where
-            I2C: Write<Error = E>,
+            I2C: I2c<Error = E>,
             AS: MultiSizeAddr,
         {
             fn page_write(&mut self, address: u32, data: &[u8]) -> Result<(), Error<E>> {
@@ -251,7 +251,7 @@ macro_rules! impl_for_page_size {
 
         impl<I2C, E, AS, SN> crate::Eeprom24xTrait for Eeprom24x<I2C, page_size::$PS, AS, SN>
         where
-            I2C: Write<Error = E> + WriteRead<Error=E> + embedded_hal::blocking::i2c::Read<Error = E>,
+            I2C: I2c<Error = E>,
             AS: MultiSizeAddr
             {
                 type Error = E;

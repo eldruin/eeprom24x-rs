@@ -1,5 +1,8 @@
 use eeprom24x::{Eeprom24x, Error, Storage};
-use embedded_hal_mock::i2c::{Mock as I2cMock, Transaction as I2cTrans};
+use embedded_hal_mock::eh1::{
+    delay::NoopDelay,
+    i2c::{Mock as I2cMock, Transaction as I2cTrans},
+};
 use embedded_storage::{ReadStorage, Storage as _};
 mod common;
 use crate::common::{
@@ -9,24 +12,10 @@ use crate::common::{
     DEV_ADDR,
 };
 
-struct MockCountDown;
-impl embedded_hal::timer::CountDown for MockCountDown {
-    type Time = core::time::Duration;
-    fn start<T>(&mut self, _count: T)
-    where
-        T: Into<core::time::Duration>,
-    {
-        // no-op, just mock
-    }
-    fn wait(&mut self) -> nb::Result<(), void::Void> {
-        Ok(()) // always time-out immediately, just used for busy-waiting
-    }
-}
-
 fn storage_new<PS, AS, SN>(
     eeprom: Eeprom24x<I2cMock, PS, AS, SN>,
-) -> Storage<I2cMock, PS, AS, SN, MockCountDown> {
-    Storage::new(eeprom, MockCountDown)
+) -> Storage<I2cMock, PS, AS, SN, NoopDelay> {
+    Storage::new(eeprom, NoopDelay)
 }
 
 macro_rules! can_query_capacity {
