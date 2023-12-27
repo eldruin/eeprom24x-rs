@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 use eeprom24x::{Eeprom24x, Eeprom24xTrait, SlaveAddr};
-use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::delay::DelayNs;
 use linux_embedded_hal::{Delay, I2cdev};
 
 fn run<E: Debug>(eeprom: &mut impl Eeprom24xTrait<Error = E>) {
@@ -9,7 +9,7 @@ fn run<E: Debug>(eeprom: &mut impl Eeprom24xTrait<Error = E>) {
 
     eeprom.write_byte(memory_address, data).unwrap();
 
-    Delay.delay_ms(5u16);
+    Delay.delay_ms(5u32);
 
     let read_data = eeprom.read_byte(memory_address).unwrap();
 

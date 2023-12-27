@@ -1,4 +1,4 @@
-use embedded_hal_mock::i2c::Transaction as I2cTrans;
+use embedded_hal_mock::eh1::i2c::Transaction as I2cTrans;
 mod common;
 use crate::common::{
     destroy, new_24csx01, new_24csx02, new_24csx04, new_24csx08, new_24csx16, new_24csx32,

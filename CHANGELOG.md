@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- [breaking-change] Transitioned the `embedded-storage` interface to
+  use the new `embedded-hal` `DelayNs` trait instead of the old `CountDown`
+- [breaking-change] Transitioned `embedded-hal` to version 1.0
+- Updated `embedded-storage` to version 0.3.1
 
 
 ## [0.6.1] - 2023-12-27
