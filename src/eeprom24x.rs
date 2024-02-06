@@ -307,8 +307,8 @@ impl_for_page_size!(
     ["24x02", "AT24C02", 8, No, new_24x02],
     ["24CSx01", "24CS01", 7, Yes, new_24csx01],
     ["24CSx02", "24CS02", 8, Yes, new_24csx02],
-    ["24AAx02E48", "24AA02E48", 8, No, new_24aax02e48],
-    ["24AAx02E64", "24AA02E64", 8, No, new_24aax02e64]
+    ["24x02E48", "24AA02E48", 8, No, new_24x02e48],
+    ["24x02E64", "24AA02E64", 8, No, new_24x02e64]
 );
 impl_for_page_size!(
     OneByte,
