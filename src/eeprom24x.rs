@@ -321,8 +321,8 @@ impl_for_page_size!(
     ["24CSx04", "AT24CS04", 9, Yes, new_24csx04],
     ["24CSx08", "AT24CS08", 10, Yes, new_24csx08],
     ["24CSx16", "AT24CS16", 11, Yes, new_24csx16],
-    ["24AAx025E48", "24AA025E48", 8, No, new_24aax025e48],
-    ["24AAx025E64", "24AA025E64", 8, No, new_24aax025e64],
+    ["24x025E48", "24AA025E48", 8, No, new_24x025e48],
+    ["24x025E64", "24AA025E64", 8, No, new_24x025e64],
     ["M24C01", "M24C01", 7, No, new_m24x01],
     ["M24C02", "M24C02", 8, No, new_m24x02]
 );
