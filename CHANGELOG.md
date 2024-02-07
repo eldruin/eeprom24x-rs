@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
-- Add support for 24AAxE48/E64 devices.
+- Add support for 24AA02xE48/E64 devices.
 
 ## [0.6.1] - 2023-12-27
 
