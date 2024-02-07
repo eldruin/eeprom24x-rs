@@ -306,7 +306,9 @@ impl_for_page_size!(
     ["24x01", "AT24C01", 7, No, new_24x01],
     ["24x02", "AT24C02", 8, No, new_24x02],
     ["24CSx01", "24CS01", 7, Yes, new_24csx01],
-    ["24CSx02", "24CS02", 8, Yes, new_24csx02]
+    ["24CSx02", "24CS02", 8, Yes, new_24csx02],
+    ["24x02E48", "24AA02E48", 8, No, new_24x02e48],
+    ["24x02E64", "24AA02E64", 8, No, new_24x02e64]
 );
 impl_for_page_size!(
     OneByte,
@@ -319,6 +321,8 @@ impl_for_page_size!(
     ["24CSx04", "AT24CS04", 9, Yes, new_24csx04],
     ["24CSx08", "AT24CS08", 10, Yes, new_24csx08],
     ["24CSx16", "AT24CS16", 11, Yes, new_24csx16],
+    ["24x025E48", "24AA025E48", 8, No, new_24x025e48],
+    ["24x025E64", "24AA025E64", 8, No, new_24x025e64],
     ["M24C01", "M24C01", 7, No, new_m24x01],
     ["M24C02", "M24C02", 8, No, new_m24x02]
 );
