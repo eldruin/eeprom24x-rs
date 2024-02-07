@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Added
+- Add support for 24AA02xE48/E64 devices.
+
 ## [0.7.0] - 2024-01-18
 
 ### Changed
@@ -15,7 +18,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   use the new `embedded-hal` `DelayNs` trait instead of the old `CountDown`
 - [breaking-change] Transitioned `embedded-hal` to version 1.0
 - Updated `embedded-storage` to version 0.3.1
-- Add support for 24AA02xE48/E64 devices.
 
 ## [0.6.1] - 2023-12-27
 
