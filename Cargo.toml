@@ -1,6 +1,6 @@
 [package]
 name = "eeprom24x"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Diego Barrios Romero <eldruin@gmail.com>"]
 repository = "https://github.com/eldruin/eeprom24x-rs"
 license = "MIT OR Apache-2.0"
@@ -21,14 +21,12 @@ include = [
 edition = "2021"
 
 [dependencies]
-embedded-hal = "0.2.7"
-embedded-storage = "0.3.0"
-nb = "1.1"
+embedded-hal = "1"
+embedded-storage = "0.3.1"
 
 [dev-dependencies]
-linux-embedded-hal = "0.3"
-embedded-hal-mock = "0.9"
-void = { version = "1.0.2", default-features = false }
+linux-embedded-hal = "0.4"
+embedded-hal-mock = { version = "0.10", features = ["eh1"] }
 
 [profile.release]
 lto = true

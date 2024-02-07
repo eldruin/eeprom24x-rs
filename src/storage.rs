@@ -2,53 +2,43 @@ use crate::{
     eeprom24x::{MultiSizeAddr, PageWrite},
     Eeprom24x, Error, Storage,
 };
-use core::{cmp::min, time::Duration};
-use embedded_hal::{
-    blocking::i2c::{Write, WriteRead},
-    timer::CountDown,
-};
+use core::cmp::min;
+use embedded_hal::{delay::DelayNs, i2c::I2c};
 use embedded_storage::ReadStorage;
 
 /// Common methods
-impl<I2C, PS, AS, SN, CD> Storage<I2C, PS, AS, SN, CD> {}
+impl<I2C, PS, AS, SN, D> Storage<I2C, PS, AS, SN, D> {}
 
 /// Common methods
-impl<I2C, PS, AS, SN, CD> Storage<I2C, PS, AS, SN, CD>
+impl<I2C, PS, AS, SN, D> Storage<I2C, PS, AS, SN, D>
 where
-    CD: CountDown<Time = Duration>,
+    D: DelayNs,
 {
     /// Create a new Storage instance wrapping the given Eeprom
-    pub fn new(eeprom: Eeprom24x<I2C, PS, AS, SN>, mut count_down: CD) -> Self {
-        // When writing to the eeprom, we start a countdown of 5 ms after each page and wait for
-        // the timer before writing to the next page. Therefore, we always need a valid countdown
-        // so we start it here without any delay.
-        // Furthermore, we also have to wait for the countdown before reading the eeprom again.
-        // Basically, we have to wait before any I2C access and ensure that the countdown is
-        // running again afterwards.
-        count_down.start(Duration::from_millis(0));
-        Storage { eeprom, count_down }
+    pub fn new(eeprom: Eeprom24x<I2C, PS, AS, SN>, delay: D) -> Self {
+        // When writing to the eeprom, we delay by 5 ms after each page
+        // before writing to the next page.
+        Storage { eeprom, delay }
     }
 }
 
 /// Common methods
-impl<I2C, PS, AS, SN, CD> Storage<I2C, PS, AS, SN, CD> {
+impl<I2C, PS, AS, SN, D> Storage<I2C, PS, AS, SN, D> {
     /// Destroy driver instance, return I²C bus and timer instance.
-    pub fn destroy(self) -> (I2C, CD) {
-        (self.eeprom.destroy(), self.count_down)
+    pub fn destroy(self) -> (I2C, D) {
+        (self.eeprom.destroy(), self.delay)
     }
 }
 
-impl<I2C, E, PS, AS, SN, CD> embedded_storage::ReadStorage for Storage<I2C, PS, AS, SN, CD>
+impl<I2C, E, PS, AS, SN, D> embedded_storage::ReadStorage for Storage<I2C, PS, AS, SN, D>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c<Error = E>,
     AS: MultiSizeAddr,
-    CD: CountDown<Time = Duration>,
+    D: DelayNs,
 {
     type Error = Error<E>;
 
     fn read(&mut self, offset: u32, bytes: &mut [u8]) -> Result<(), Self::Error> {
-        let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
-        self.count_down.start(Duration::from_millis(0));
         self.eeprom.read_data(offset, bytes)
     }
 
@@ -57,12 +47,12 @@ where
     }
 }
 
-impl<I2C, E, PS, AS, SN, CD> embedded_storage::Storage for Storage<I2C, PS, AS, SN, CD>
+impl<I2C, E, PS, AS, SN, D> embedded_storage::Storage for Storage<I2C, PS, AS, SN, D>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c<Error = E>,
     AS: MultiSizeAddr,
     Eeprom24x<I2C, PS, AS, SN>: PageWrite<E>,
-    CD: CountDown<Time = Duration>,
+    D: DelayNs,
 {
     fn write(&mut self, mut offset: u32, mut bytes: &[u8]) -> Result<(), Self::Error> {
         if offset as usize + bytes.len() > self.capacity() {
@@ -70,7 +60,6 @@ where
         }
         let page_size = self.eeprom.page_size();
         while !bytes.is_empty() {
-            let _ = nb::block!(self.count_down.wait()); // CountDown::wait() never fails
             let this_page_offset = offset as usize % page_size;
             let this_page_remaining = page_size - this_page_offset;
             let chunk_size = min(bytes.len(), this_page_remaining);
@@ -80,10 +69,9 @@ where
             // TODO At least ST's eeproms allow polling, i.e. trying the next i2c access which will
             // just be NACKed as long as the device is still busy. This could potentially speed up
             // the write process.
-            // TODO Currently outdated comment:
             // A (theoretically needless) delay after the last page write ensures that the user can
             // call Storage::write() again immediately.
-            self.count_down.start(Duration::from_millis(5));
+            self.delay.delay_ms(5);
         }
         Ok(())
     }

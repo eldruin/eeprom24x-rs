@@ -144,13 +144,13 @@
 //! ### Using embedded-storage traits
 //!
 //! ```no_run
-//! use linux_embedded_hal::{I2cdev, SysTimer};
+//! use linux_embedded_hal::{I2cdev, Delay};
 //! use eeprom24x::{ Eeprom24x, SlaveAddr, Storage };
 //! use embedded_storage::{ReadStorage, Storage as _};
 //!
 //! let dev = I2cdev::new("/dev/i2c-1").unwrap();
 //! let eeprom = Eeprom24x::new_24x256(dev, SlaveAddr::default());
-//! let mut storage = Storage::new(eeprom, SysTimer::new());
+//! let mut storage = Storage::new(eeprom, Delay {});
 //! let _capacity = storage.capacity();
 //! let address = 0x1234;
 //! let data = [0xAB; 256];
@@ -288,13 +288,13 @@ pub trait Eeprom24xTrait: private::Sealed {
 }
 
 /// EEPROM24X extension which supports the `embedded-storage` traits but requires an
-/// `embedded_hal::timer::CountDown` to handle the timeouts when writing over page boundaries
+/// `embedded_hal::delay::DelayNs` to handle the timeouts when writing over page boundaries
 #[derive(Debug)]
-pub struct Storage<I2C, PS, AS, SN, CD> {
+pub struct Storage<I2C, PS, AS, SN, D> {
     /// Eeprom driver over which we implement the Storage traits
     pub eeprom: Eeprom24x<I2C, PS, AS, SN>,
-    /// CountDown timer
-    count_down: CD,
+    /// Delay provider
+    delay: D,
 }
 
 mod private {

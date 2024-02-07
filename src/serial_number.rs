@@ -2,7 +2,7 @@ use crate::{
     addr_size::{OneByte, TwoBytes},
     unique_serial, Eeprom24x, Error,
 };
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::I2c;
 
 /// Determine the peripheral address for accessing the secure region
 /// of 24CS devices.
@@ -21,7 +21,7 @@ fn secure_region_addr(address_bits: u8, base_addr: u8) -> u8 {
 /// and 24CSx16.
 impl<I2C, PS, E> Eeprom24x<I2C, PS, OneByte, unique_serial::Yes>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c<Error = E>,
 {
     /// Read the 128-bit unique serial number.
     pub fn read_unique_serial(&mut self) -> Result<[u8; 16], Error<E>> {
@@ -38,7 +38,7 @@ where
 /// for devices with two byte addresses. e.g. 24CSx32 and 24CSx64
 impl<I2C, PS, E> Eeprom24x<I2C, PS, TwoBytes, unique_serial::Yes>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c<Error = E>,
 {
     /// Read the 128-bit unique serial number.
     pub fn read_unique_serial(&mut self) -> Result<[u8; 16], Error<E>> {
