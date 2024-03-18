@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Add support for 24AA02xE48/E64 devices.
+- Add `Debug` derive to markers.
 
 ## [0.7.0] - 2024-01-18
 
