@@ -197,35 +197,46 @@ pub enum SlaveAddr {
 pub mod addr_size {
     /// 1-byte memory address.
     /// e.g. for AT24x00, AT24x01, AT24x02, AT24x04, AT24x08, AT24x16
+    #[derive(Debug)]
     pub struct OneByte(());
     /// 2-byte memory address.
     /// e.g. for AT24x32, AT24x64, AT24x128, AT24x256, AT24x512, AT24xM01, AT24xM02
+    #[derive(Debug)]
     pub struct TwoBytes(());
 }
 
 /// Page size markers
 pub mod page_size {
     /// No page write supported. e.g. for AT24x00
+    #[derive(Debug)]
     pub struct No(());
     /// 8-byte pages. e.g. for AT24x01, AT24x02
+    #[derive(Debug)]
     pub struct B8(());
     /// 16-byte pages. e.g. for AT24x04, AT24x08, AT24x16
+    #[derive(Debug)]
     pub struct B16(());
     /// 32-byte pages. e.g. for AT24x32, AT24x64
+    #[derive(Debug)]
     pub struct B32(());
     /// 64-byte pages. e.g. for AT24x128, AT24x256
+    #[derive(Debug)]
     pub struct B64(());
     /// 128-byte pages. e.g. for AT24x512
+    #[derive(Debug)]
     pub struct B128(());
     /// 256-byte pages. e.g. for AT24xM01, AT24xM02
+    #[derive(Debug)]
     pub struct B256(());
 }
 
 /// Factory-supplied unique serial number markers
 pub mod unique_serial {
     /// Contains a factory-supplied unique serial number. e.g. for AT24CSx
+    #[derive(Debug)]
     pub struct Yes(());
     /// No factory-supplied unique serial number
+    #[derive(Debug)]
     pub struct No(());
 }
 
