@@ -21,7 +21,7 @@ include = [
 edition = "2021"
 
 [features]
-defmt-03 = ["dep:defmt"]
+defmt-03 = ["dep:defmt", "embedded-hal/defmt-03"]
 
 [dependencies]
 embedded-hal = "1"
