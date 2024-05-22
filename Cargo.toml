@@ -1,6 +1,6 @@
 [package]
 name = "eeprom24x"
-version = "0.7.2"
+version = "0.7.1"
 authors = ["Diego Barrios Romero <eldruin@gmail.com>"]
 repository = "https://github.com/eldruin/eeprom24x-rs"
 license = "MIT OR Apache-2.0"
