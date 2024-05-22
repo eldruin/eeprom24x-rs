@@ -12,8 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Add feature defmt-03
-- When feature enabled, "defmt::Format" is derived for any public struct or enum that derives Debug.
+- Add feature `defmt-03` to derive "`defmt::Format`" from `defmt = "0.3"` for public types.
 
 ## [0.7.1] - 2024-05-02
 
