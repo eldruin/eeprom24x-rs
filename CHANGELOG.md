@@ -8,8 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
-## [0.7.2] - 2024-05-16
-
 ### Added
 
 - Add feature `defmt-03` to derive "`defmt::Format`" from `defmt = "0.3"` for public types.
