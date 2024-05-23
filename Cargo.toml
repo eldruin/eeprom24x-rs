@@ -20,9 +20,13 @@ include = [
 ]
 edition = "2021"
 
+[features]
+defmt-03 = ["dep:defmt", "embedded-hal/defmt-03"]
+
 [dependencies]
 embedded-hal = "1"
 embedded-storage = "0.3.1"
+defmt = { version = "0.3.6", optional = true }
 
 [dev-dependencies]
 linux-embedded-hal = "0.4"

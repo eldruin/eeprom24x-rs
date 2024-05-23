@@ -8,15 +8,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.7.2] - 2024-05-16
+
+### Added
+
+- Add feature `defmt-03` to derive "`defmt::Format`" from `defmt = "0.3"` for public types.
+
 ## [0.7.1] - 2024-05-02
 
 ### Added
+
 - Add support for 24AA02xE48/E64 devices.
 - Add `Debug` derive to markers.
 
 ## [0.7.0] - 2024-01-18
 
 ### Changed
+
 - [breaking-change] Transitioned the `embedded-storage` interface to
   use the new `embedded-hal` `DelayNs` trait instead of the old `CountDown`
 - [breaking-change] Transitioned `embedded-hal` to version 1.0
@@ -25,58 +33,75 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.6.1] - 2023-12-27
 
 ### Added
+
 - Add support for 24CSx devices.
 - Implement `read_unique_serial` for 24CSx devices.
 
 ## [0.6.0] - 2023-07-10
 
 ### Added
+
 - Trait `Eeprom24xTrait` providing the device interface.
 
 ### Changed
+
 - Updated `embedded-storage` dependency to version 0.3.
 - Updated `nb` dependency to version 1.1.
 - Increase MSRV to version 1.60.0.
 
 ## [0.5.0] - 2022-01-20
+
 ### Added
+
 - Add support for STM M24C01 and M24C02.
 - Implement `embedded_storage::ReadStorage` and `embedded_storage::Storage` traits.
 
 ### Changed
+
 - [breaking-change] Increase MSRV to version 1.51.0.
 
 ## [0.4.0] - 2021-09-04
+
 ### Added
+
 - `PartialEq` implementation for `SlaveAddr`.
 
 ### Changed
+
 - [breaking-change] Remove `Default` derive for `Eeprom24x`.
   Technically a breaking change but it should not affect anybody.
 
 ## [0.3.0] - 2019-01-20
+
 ### Changed
+
 - [breaking-change] The addresses are now passed as a single `u32`.
 User code should be easy to adapt:
 `eeprom.read_byte([0x12, 0x34])` now becomes: `eeprom.read_byte(0x1234)`.
 
 ### Fixed
+
 - High memory addressing in devices using some device address bits for memory
 addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02`.
 - Protect against memory address rollover.
 - Protect against page address rollover.
 
 ## [0.2.1] - 2019-01-20
+
 ### Removed
+
 - [breaking-change] Removed support for devices that use some device address
 bits for memory addressing: `24x04`, `24x08`, `24x16`, `24xM01`, `24xM02` as
 the addressing was erroneous. Please upgrade to version `0.3.0` to use them.
 
 ## [0.2.0] - 2018-11-22
+
 ### Added
+
 - Add support for many more devices.
 
 ### Changed
+
 - [breaking-change] The addresses are now passed to the methods per value for
 efficiency reasons. i.e. `address: &[u8; 2]` has now become `address: [u8; 2]`
 in all methods. User code should be easy to adapt:
@@ -86,7 +111,9 @@ in all methods. User code should be easy to adapt:
 is a marker type for the page size instead of the device name.
 
 ## [0.1.1] - 2018-08-22
+
 ### Fixed
+
 - Disallow setting a different slave address through `SlaveAddr::Default`.
 
 ## 0.1.0 - 2018-08-18
