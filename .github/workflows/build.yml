@@ -21,6 +21,10 @@ jobs:
           - thumbv7em-none-eabi
           - thumbv7em-none-eabihf
           - thumbv7m-none-eabi
+        features: ['', '--features=defmt-03']
+        exclude:
+          - rust: 1.60.0
+            features: '--features=defmt-03'
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +43,7 @@ jobs:
       - run: ./ci/patch-no-std.sh
         if: ${{ ! contains(matrix.TARGET, 'x86_64') }}
 
-      - run: cargo build --target=${{ matrix.TARGET }}
+      - run: cargo build --target=${{ matrix.TARGET }} ${{ matrix.features }}
 
   checks:
     name: Checks
