@@ -114,7 +114,7 @@ To enable [defmt](https://crates.io/crates/defmt) (version `0.3.x`) support, whe
 
 ```toml
 [dependencies]
-eeprom24x = { version = "0.7.1", features = ["defmt-03"] }
+eeprom24x = { version = "0.7.2", features = ["defmt-03"] }
 ```
 
 ## Support

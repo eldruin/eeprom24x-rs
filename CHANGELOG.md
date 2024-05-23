@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.7.2] - 2024-05-23
+
 ### Added
 
 - Add feature `defmt-03` to derive "`defmt::Format`" from `defmt = "0.3"` for public types.
@@ -121,7 +123,8 @@ may be some API changes in the future, in case I decide that something can be
 further improved. All changes will be documented in this CHANGELOG.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/eldruin/eeprom24x-rs/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/eldruin/eeprom24x-rs/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/eldruin/eeprom24x-rs/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/eldruin/eeprom24x-rs/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/eldruin/eeprom24x-rs/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/eldruin/eeprom24x-rs/compare/v0.6.0...v0.6.1
