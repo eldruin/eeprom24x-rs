@@ -110,38 +110,11 @@ fn main() {
 
 ### defmt-03
 
-defmt ("de format", short for "deferred formatting") is a highly efficient logging framework that targets resource-constrained devices, like microcontrollers. Learn more about defmt at [https://defmt.ferrous-systems.com].
-
-When feature "defmt-03" is enabled for the eeprom24x-rs dependency, defmt::Format is derived for all public struct and enum definitions. This allows (deferred-)formatting of data for logging and other reporting using the defmt crate. Data from the eeprom24x crate can then be logged alongside any other defmt-supported data using the normal defmt statements.
-
-To enable defmt support, when specifying a dependency on eeprom24x, add the feature "defmt-03"
+To enable [defmt](https://crates.io/crates/defmt) (version `0.3.x`) support, when specifying the dependency on `eeprom24x`, add the feature "`defmt-03`".
 
 ```toml
 [dependencies]
-eeprom24x = { version = "0.7.2", features = ["defmt-03"] }
-```
-
-#### defmt-03 usage
-
-```rust
-use eeprom24x::{Eeprom24x, SlaveAddr};
-use embedded_hal::blocking::delay::DelayMs;
-use linux_embedded_hal::{Delay, I2cdev};
-
-fn main() {
-    let dev = I2cdev::new("/dev/i2c-1").unwrap();
-    let address = SlaveAddr::default();
-    let mut eeprom = Eeprom24x::new_24x256(dev, address);
-    let memory_address = 0x1234;
-    let data = 0xAB;
-
-    if let Err(e) = eeprom.write_byte(memory_address, data) {
-        defmt::error!("eeprom.write_byte error {:?}", e);
-        // panic or other error handling here...
-    }
-
-    let _dev = eeprom.destroy(); // Get the I2C device back
-}
+eeprom24x = { version = "0.7.1", features = ["defmt-03"] }
 ```
 
 ## Support

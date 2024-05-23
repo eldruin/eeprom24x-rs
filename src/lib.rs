@@ -70,6 +70,17 @@
 //! [AT24CM01]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8812-SEEPROM-AT24CM01-Datasheet.pdf
 //! [AT24CM02]: https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8828-SEEPROM-AT24CM02-Datasheet.pdf
 //!
+//! ## Features
+//!
+//! ### defmt-03
+//!
+//! To enable [defmt](https://crates.io/crates/defmt) (version `0.3.x`) support, when specifying the dependency on `eeprom24x`, add the feature "`defmt-03`".
+//!
+//! ```toml
+//! [dependencies]
+//! eeprom24x = { version = "0.7.1", features = ["defmt-03"] }
+//! ```
+//!
 //! ## Usage examples (see also examples folder)
 //!
 //! To create a new instance you can use the `new_<device>` methods.
